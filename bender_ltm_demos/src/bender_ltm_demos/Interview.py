@@ -19,7 +19,7 @@ from uchile_states.interaction.states import Speak
 from uchile_states.head.states import LookFront, LookHome, LookPerson, LookCrowd
 
 #LTM
-from ltm_demos import AskNameSimple
+# from bender_ltm_demos import AskNameSimple
 
 #MSG
 from bender_ltm_plugins.msg import HumanEntity
@@ -101,15 +101,15 @@ def getInstance(robot):
         )
         smach.StateMachine.add('NOTIFY_OPERATOR',Speak(robot,text="Hi operator"), #, please look into my eyes, so I can get a good look at you."),
             transitions={
-                'succeeded':'NOTIFY_READY'
+                'succeeded':'GET_INFORMATION'
             }
         )
         #CAmbiar a que funcione por teclado o colocar alternativa
-        smach.StateMachine.add('ASK_NAME',AskNameSimple.getInstance(robot),
-            transitions={
-                'succeeded': 'GET_INFORMATION'
-            }
-        ) 
+        # smach.StateMachine.add('ASK_NAME',AskNameSimple.getInstance(robot),
+        #     transitions={
+        #         'succeeded': 'GET_INFORMATION'
+        #     }
+        # ) 
 
         smach.StateMachine.add('GET_INFORMATION', facial_features_recognition.getInstance(robot),
             transitions={

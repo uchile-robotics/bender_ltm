@@ -55,6 +55,7 @@
     <depend>std_srvs</depend>
     <depend>smach</depend>
     <depend>smach_ros</depend>
+    <depend>bender_ltm_plugins</depend>
     
     <depend>uchile_msgs</depend>
     <depend>uchile_srvs</depend>    

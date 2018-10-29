@@ -83,7 +83,7 @@ if __name__ == '__main__':
     else:
         from maqui_skills import robot_factory
 
-    rospy.init_node('ask_name')
+    rospy.init_node('ask_name_simple')
     robot = robot_factory.build(["tts","audition"],core=False)
 
     robot.check()
