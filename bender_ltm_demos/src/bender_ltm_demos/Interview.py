@@ -26,7 +26,7 @@ from bender_ltm_plugins.msg import HumanEntity
 
 class PublishInformation(smach.State):
     def __init__(self,robot):
-        smach.State.__init__(self, outcomes = ['succeeded','failed','aborted','preempted'],
+        smach.State.__init__(self, outcomes = ['succeeded','aborted','preempted'],
                     input_keys=['operator_name','features','facial_features', 'facial_features_image','face_emotion'],
                     output_keys=['features','facial_features'])
         self.robot=robot
@@ -87,19 +87,19 @@ def getInstance(robot):
     sm.userdata.features = ['gender','age']
 
     with sm:
-        smach.StateMachine.add('LOOKPERSON',LookPerson(robot),
-            transitions={
-                'succeeded':'WAIT_OPERATOR'
-            }
-        )
+        # smach.StateMachine.add('LOOKPERSON',LookPerson(robot),
+        #     transitions={
+        #         'succeeded':'WAIT_OPERATOR'
+        #     }
+        # )
         smach.StateMachine.add('WAIT_OPERATOR',wait_face_detection.getInstance(robot, timeout=20),
             transitions={
-                'succeeded':'NOTIFY_OPERATOR',
-                'aborted' : 'NOTIFY_OPERATOR',
-                'preempted':'NOTIFY_OPERATOR'
+                'succeeded':'GREET_OPERATOR',
+                'aborted' : 'GREET_OPERATOR',
+                'preempted':'GREET_OPERATOR'
             }
         )
-        smach.StateMachine.add('NOTIFY_OPERATOR',Speak(robot,text="Hi operator"), #, please look into my eyes, so I can get a good look at you."),
+        smach.StateMachine.add('GREET_OPERATOR',Speak(robot,text="Hi operator"), #, please look into my eyes, so I can get a good look at you."),
             transitions={
                 'succeeded':'GET_INFORMATION'
             }
@@ -118,7 +118,8 @@ def getInstance(robot):
         )
         smach.StateMachine.add('GET_EMOTION', emotion_recognition.getInstance(robot),
             transitions={
-                'succeeded':'PUBLISH_INFORMATION'
+                'succeeded':'PUBLISH_INFORMATION',
+                'failed':'PUBLISH_INFORMATION'
                 }
         )
         smach.StateMachine.add('PUBLISH_INFORMATION', PublishInformation(robot))
@@ -128,11 +129,15 @@ def getInstance(robot):
 
 if __name__ == '__main__':
 
-    rospy.init_node('WAIT_OPERATOR')
+    rospy.init_node('INTERVIEW')
 
     #Only for testing 
-    robot = robot_factory.build(["tts","AI","audition","facial_features","neck"], core=False)
+    # robot = robot_factory.build(["tts","audition","facial_features","neck"], core=False)
+    robot = robot_factory.build(["tts","audition","facial_features"], core=False)
 
     robot.check()
+
     sm = getInstance(robot)
+    sis = smach_ros.IntrospectionServer('interview_server', sm, '/INTERVIEW')
+    sis.start()
     outcome = sm.execute()
