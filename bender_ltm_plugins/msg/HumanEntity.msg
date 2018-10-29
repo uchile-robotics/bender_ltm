@@ -12,7 +12,6 @@ sensor_msgs/Image face
 # dynamic fields
 string emotion
 time last_seen
-time last_interacted
 
 uint8 UNKNOWN=0
 

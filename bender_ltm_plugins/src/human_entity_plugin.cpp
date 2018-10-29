@@ -31,11 +31,10 @@ namespace bender_ltm_plugins
         // _field_names.insert("face");
         _field_names.insert("emotion");
         _field_names.insert("last_seen");
-        _field_names.insert("last_interacted");
 
         // parameters
         ltm::util::ParameterServerWrapper psw("~");
-        psw.getParameter(param_ns + "topic", _stm_topic, "/robot/fake_short_term_memory/person/updates");
+        psw.getParameter(param_ns + "topic", _stm_topic, "/bender/ltm/entity/person/update");
 
         ros::NodeHandle priv("~");
         _sub = priv.subscribe(_stm_topic, 1, &HumanEntityPlugin::callback, this);
@@ -134,9 +133,6 @@ namespace bender_ltm_plugins
         double last_seen = entity.last_seen.sec + entity.last_seen.nsec * pow10(-9);
         meta->append("last_seen", last_seen);
 
-        double last_interacted = entity.last_interacted.sec + entity.last_interacted.nsec * pow10(-9);
-        meta->append("last_interacted", last_interacted);
-
         return meta;
     }
 
@@ -178,7 +174,6 @@ namespace bender_ltm_plugins
             curr.face = curr_with_md->face;
             curr.emotion = curr_with_md->emotion;
             curr.last_seen = curr_with_md->last_seen;
-            curr.last_interacted = curr_with_md->last_interacted;
         } else {
             // NEW ENTITY
             curr.meta.init_log = curr.meta.log_uid;
@@ -199,7 +194,6 @@ namespace bender_ltm_plugins
         entity::update_field<sensor_msgs::Image>(log, "face", curr.face, diff.face, msg.face, _null_e.face);
         entity::update_field<std::string>(log, "emotion", curr.emotion, diff.emotion, msg.emotion, _null_e.emotion);
         entity::update_field<ros::Time>(log, "last_seen", curr.last_seen, diff.last_seen, msg.last_seen, _null_e.last_seen);
-        entity::update_field<ros::Time>(log, "last_interacted", curr.last_interacted, diff.last_interacted, msg.last_interacted, _null_e.last_interacted);
 
         size_t n_added = log.new_f.size();
         size_t n_updated = log.updated_f.size();
@@ -325,10 +319,9 @@ namespace bender_ltm_plugins
         else if (name == "age_top") { out.age_top = _in.age_top; }
         else if (name == "age_avg") { out.age_avg = _in.age_avg; }
         else if (name == "live_phase") { out.live_phase = _in.live_phase; }
-        else if (name == "face") { out.face = _in.face; }
         else if (name == "emotion") { out.emotion = _in.emotion; }
+        else if (name == "face") { out.face = _in.face; }
         else if (name == "last_seen") { out.last_seen = _in.last_seen; }
-        else if (name == "last_interacted") { out.last_interacted = _in.last_interacted; }
     }
 
     void HumanEntityPlugin::build_null(EntityMsg &entity) {
@@ -341,7 +334,5 @@ namespace bender_ltm_plugins
         entity.face = sensor_msgs::Image();
         entity.emotion = "";
         entity.last_seen = ros::Time(0);
-        entity.last_interacted = ros::Time(0);
     }
-
 }
