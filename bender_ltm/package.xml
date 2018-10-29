@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+  
+    <!-- PACKAGE INFORMATION -->
+    <!-- - - - - - - - - - - -->
+
+    <name>bender_ltm</name>
+    <version>2.0.0</version>
+
+    <description>LTM packages for bender demonstration</description>
+    <maintainer email="bender.devel@gmail.com">
+      Bender Team - UChile Homebreakers</maintainer>
+    <author     email="bender.devel@gmail.com">
+      Bender Team - UChile Homebreakers</author>
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    
+    <export>
+      <metapackage/>
+    </export>
+
+</package>
