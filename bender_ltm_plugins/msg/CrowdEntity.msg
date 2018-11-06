@@ -6,5 +6,4 @@ uint8 n_female    #  Number of female people
 uint8 n_children  #  Number of children
 uint8 n_adults    #  Number of adults
 
-sensor_msgs/Image crowd_image
-sensor_msgs/Image[] people_images
+string location       
