@@ -101,15 +101,14 @@ def getInstance(robot):
         )
         smach.StateMachine.add('GREET_OPERATOR',Speak(robot,text="Hi operator"), #, please look into my eyes, so I can get a good look at you."),
             transitions={
-                'succeeded':'GET_INFORMATION'
+                'succeeded':'ASK_NAME'
             }
         )
-        #CAmbiar a que funcione por teclado o colocar alternativa
-        # smach.StateMachine.add('ASK_NAME',AskNameSimple.getInstance(robot),
-        #     transitions={
-        #         'succeeded': 'GET_INFORMATION'
-        #     }
-        # ) 
+        smach.StateMachine.add('ASK_NAME',AskNameSimple.getInstance(robot),
+            transitions={
+                'succeeded': 'GET_INFORMATION'
+            }
+        ) 
 
         smach.StateMachine.add('GET_INFORMATION', facial_features_recognition.getInstance(robot),
             transitions={
