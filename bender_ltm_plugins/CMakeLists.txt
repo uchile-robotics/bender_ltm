@@ -29,12 +29,14 @@ find_package(catkin REQUIRED
 add_message_files(
     FILES
     HumanEntity.msg
+    CrowdEntity.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
     FILES
     HumanEntitySrv.srv
+    CrowdEntitySrv.srv
 )
 
 # Generate added messages and services with any dependencies listed here
@@ -83,6 +85,7 @@ add_library(bender_ltm_plugins__ltm_plugins
     src/ltm_plugins.cpp
     # src/emotion_plugin.cpp
     src/human_entity_plugin.cpp
+    src/crowd_entity_plugin.cpp
 )
 add_dependencies(bender_ltm_plugins__ltm_plugins ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(bender_ltm_plugins__ltm_plugins ${catkin_LIBRARIES} ${Boost_LIBRARIES})
