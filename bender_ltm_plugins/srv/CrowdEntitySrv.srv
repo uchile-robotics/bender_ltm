@@ -1,0 +1,13 @@
+# Overview
+# ========
+# This .srv is used for Add, Get and Delete Operations
+# - add   : Request only uses msgs field. Response is empty.
+# - delete: Request only uses uids field. Response is empty.
+# - get   : Requesr uses uids and stamps. Response contains msgs.
+# ---------------------------------------------------------------
+uint32[] uids # Entity uids to get/delete.
+time[] stamps # Timestamps to get entities from.
+bender_ltm_plugins/CrowdEntity[] msgs # Used for Add service
+---
+bender_ltm_plugins/CrowdEntity[] msgs # Used for Get service
+uint32[] not_found # not found uids.
