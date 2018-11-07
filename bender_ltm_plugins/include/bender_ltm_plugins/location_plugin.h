@@ -1,24 +1,24 @@
-#ifndef BENDER_LTM_PLUGINS_EMOTION_PLUGIN_H_
-#define BENDER_LTM_PLUGINS_EMOTION_PLUGIN_H_
+#ifndef BENDER_LTM_PLUGINS_LOCATION_PLUGIN_H_
+#define BENDER_LTM_PLUGINS_LOCATION_PLUGIN_H_
 
 #include <ros/ros.h>
-#include <ltm/plugin/emotion_base.h>
+#include <ltm/plugin/location_base.h>
 #include <ltm/GetEpisodes.h>
 
 namespace bender_ltm_plugins
 {
-    class EmotionPlugin : public ltm::plugin::EmotionBase
+    class LocationPlugin : public ltm::plugin::LocationBase
     {
     public:
-        EmotionPlugin() {}
+        LocationPlugin(){}
 
-        void initialize(const std::string &param_ns);
+        void initialize(const std::string& param_ns);
 
         void register_episode(uint32_t uid);
 
         void unregister_episode(uint32_t uid);
 
-        void collect(uint32_t uid, ltm::EmotionalRelevance &msg);
+        void collect(uint32_t uid, ltm::Where& msg);
 
         void reset();
 
@@ -31,4 +31,4 @@ namespace bender_ltm_plugins
     };
 
 };
-#endif // BENDER_LTM_PLUGINS_EMOTION_PLUGIN_H_
+#endif // BENDER_LTM_PLUGINS_LOCATION_PLUGIN_H_

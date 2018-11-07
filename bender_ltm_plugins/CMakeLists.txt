@@ -83,7 +83,8 @@ link_directories(${catkin_LINK_DIRS})
 # ltm_plugins library
 add_library(bender_ltm_plugins__ltm_plugins
     src/ltm_plugins.cpp
-    # src/emotion_plugin.cpp
+    src/emotion_plugin.cpp
+    src/location_plugin.cpp
     src/human_entity_plugin.cpp
     src/crowd_entity_plugin.cpp
 )

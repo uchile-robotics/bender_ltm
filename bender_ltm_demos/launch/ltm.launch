@@ -1,0 +1,8 @@
+<launch>
+
+    <!-- LTM server -->
+    <include file="$(find ltm)/launch/ltm.launch" ns="bender">
+        <arg name="config_file" value="$(find bender_ltm_demos)/config/ltm.yaml"/>
+    </include>
+
+</launch>

@@ -1,0 +1,67 @@
+# Sample configuration file for the LTM server adapted to Bender.
+#
+# These are the plugins that are being loaded into the LTM server:
+# - bender_ltm_plugins::EmotionPlugin
+# - bender_ltm_plugins::LocationPlugin
+# - ltm_addons::ImageStreamPlugin
+# - bender_ltm_plugins::HumanEntityPlugin
+# - bender_ltm_plugins::CrowdEntityPlugin
+
+# Server parameters
+db:          "ltm_db"
+collection:  "episodes"
+host:        "localhost"
+port:         27017
+timeout:      60.0
+
+
+# LTM plugins and parameters.
+# Each plugin must define the pluginlib class and its parameters
+plugins:
+
+  # Emotion Engine pluginsrc/plugins_manager.cpp
+  emotion:
+    # Class to load through pluginlib
+    class: "bender_ltm_plugins::EmotionPlugin"
+
+  # Robot location plugin
+  location:
+    # Class to load through pluginlib
+    class: "bender_ltm_plugins::LocationPlugin"
+
+  # Stream plugins
+  streams:
+    # List of names to consider. 
+    # For each name, you must declare its class and ROS parameters.
+    include: ["image"]
+
+    # ImageStream
+    image:
+      class: "ltm_addons::ImageStreamPlugin"
+      type: "images"
+      collection: "images"
+      topic: "/robot/fake/sensors/camera/image_raw"
+      buffer_frequency: 3.0
+      buffer_size: 100
+
+  # Entity plugins
+  entities:
+    # List of names to consider. 
+    # For each name, you must declare its class and ROS parameters.
+    include: ["human", "crowd"]
+
+    # PeopleEntityPlugin
+    human:
+      class: "bender_ltm_plugins::HumanEntityPlugin"
+      type: "human"
+      collection: "human"
+      topic: "/robot/fake_short_term_memory/human/updates"
+
+
+    # ObjectsEntityPlugin
+    crowd:
+      class: "bender_ltm_plugins::CrowdEntityPlugin"
+      type: "crowd"
+      collection: "crowd"
+      topic: "/robot/fake_short_term_memory/crowd/updates"
+
