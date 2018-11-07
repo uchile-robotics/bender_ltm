@@ -3,9 +3,8 @@ import rospy
 import smach
 import smach_ros
 
-from uchile_states.interaction.states import Speak, Hear, Tell, NoiseCheck
+from uchile_states.interaction.states import Speak, Hear, Tell, NoiseCheck, KeyboardInput
 from uchile_states.interaction        import Confirmation
-
 
 class SaveNameAsInformation(smach.State):
 
@@ -25,8 +24,18 @@ def getInstance(robot):
 
     with sm:
         smach.StateMachine.add('INTRODUCE',Speak(robot,text="I am "+robot.name +". Can you tell me your name?. Please "),
-            transitions={'succeeded':'HEAR_QUESTION'}
+            transitions={'succeeded':'KEYBOARD_INPUT'}
+            # transitions={'succeeded':'HEAR_QUESTION'}
         )
+        smach.StateMachine.add('KEYBOARD_INPUT',KeyboardInput(robot),
+            transitions={
+                'succeeded':'SAVE_NAME'
+            },
+            remapping={
+                'recognized_sentence':'recognized_sentence'
+            }
+        )
+        
         smach.StateMachine.add('HEAR_QUESTION',Hear(robot,dictionary='/basic/names',web=False,timeout=10),
             transitions={
                 'succeeded':'NOISE_CHECK',
