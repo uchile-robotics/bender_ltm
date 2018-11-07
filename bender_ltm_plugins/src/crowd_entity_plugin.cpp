@@ -28,6 +28,8 @@ namespace bender_ltm_plugins
         _field_names.insert("n_female");
         _field_names.insert("n_children");
         _field_names.insert("n_adults");
+        _field_names.insert("n_elders");
+        
 
         // parameters
         ltm::util::ParameterServerWrapper psw("~");
@@ -125,6 +127,7 @@ namespace bender_ltm_plugins
         meta->append("n_female", entity.n_female);
         meta->append("n_children", entity.n_children);
         meta->append("n_adults", entity.n_adults);
+        meta->append("n_elders", entity.n_elders);
         return meta;
     }
 
@@ -163,6 +166,7 @@ namespace bender_ltm_plugins
             curr.n_female = curr_with_md->n_female;
             curr.n_children = curr_with_md->n_children;
             curr.n_adults = curr_with_md->n_adults;
+            curr.n_elders = curr_with_md->n_elders;
         } else {
             // NEW ENTITY
             curr.meta.init_log = curr.meta.log_uid;
@@ -180,7 +184,8 @@ namespace bender_ltm_plugins
         entity::update_field<uint8_t>(log, "n_female", curr.n_female, diff.n_female, msg.n_female, _null_e.n_female);
         entity::update_field<uint8_t>(log, "n_children", curr.n_children, diff.n_children, msg.n_children, _null_e.n_children);
         entity::update_field<uint8_t>(log, "n_adults", curr.n_adults, diff.n_adults, msg.n_adults, _null_e.n_adults);
-    
+        entity::update_field<uint8_t>(log, "n_elders", curr.n_elders, diff.n_elders, msg.n_elders, _null_e.n_elders);
+        
         size_t n_added = log.new_f.size();
         size_t n_updated = log.updated_f.size();
         size_t n_removed = log.removed_f.size();
@@ -305,6 +310,7 @@ namespace bender_ltm_plugins
         else if (name == "n_female") { out.n_female = _in.n_female; }
         else if (name == "n_children") { out.n_children = _in.n_children; }
         else if (name == "n_adults") { out.n_adults = _in.n_adults; }
+        else if (name == "n_elders") { out.n_elders = _in.n_elders; }
     }
 
     void CrowdEntityPlugin::build_null(EntityMsg &entity) {
@@ -314,5 +320,6 @@ namespace bender_ltm_plugins
         entity.n_female = 0;
         entity.n_children = 0;
         entity.n_adults = 0;
+        entity.n_elders = 0;
     }
 }
