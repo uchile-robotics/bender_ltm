@@ -25,7 +25,7 @@ from uchile_states.perception import crowd_information2 as crowd_information
 # from uchile_states.perception import wait_open_door
 
 #MSG
-from bender_ltm_plugins.msg import HumanEntity
+from bender_ltm_plugins.msg import CrowdEntity
 
 #LTM
 from bender_ltm_demos import CrowdInformationSimple
@@ -34,35 +34,38 @@ from bender_ltm_demos import CrowdInformationSimple
 class PublishInformation(smach.State):
     def __init__(self,robot):
         smach.State.__init__(self, outcomes = ['succeeded','aborted','preempted'],
-                    input_keys=['operator_name','features','facial_features', 'facial_features_image','face_emotion'],
+                    input_keys=['crowd_location','n_people', 'n_male', 'n_female', 'n_children', 'n_adults', 'n_elders'],
                    )
         self.robot=robot
-        self._ltm_topic = "/bender/ltm/entity/human/update"
-        self.ltm_pub = rospy.Publisher(self._ltm_topic, HumanEntity, queue_size=10)
+        self._ltm_topic = "/bender/ltm/entity/crowd/update"
+        self.ltm_pub = rospy.Publisher(self._ltm_topic, CrowdEntity, queue_size=10)
 
 
     def execute(self, userdata):
 
-        entity = HumanEntity()
-        entity.name = userdata.operator_name
-        # entity.emotion = userdate.face_emotion
+        entity = CrowdEntity()
+
+        entity.location = userdata.crowd_location
+        entity.n_people = userdata.n_people
+        entity.n_male = userdata.n_male
+        entity.n_female = userdata.n_female
+        entity.n_children = userdata.n_children
+        entity.n_adults = userdata.n_adults
+        entity.n_elders = userdata.n_elders
 
         self.ltm_pub.publish(entity)
 
         return 'succeeded'
         
 
+
 def getInstance(robot):
     sm = smach.StateMachine(outcomes=['succeeded','aborted','preempted'])
 
-    WAVING = True
-    PLACE_START = "gpsr_init"
-    PLACE_EXIT = "bar"
-    sm.userdata.recognized_sentence = ""
-    sm.userdata.features = ['gender','age']# 'posture']
 
-    sm.userdata.input_text = ""
-    sm.userdata.neck_joints = []
+    sm.userdata.crowd_location = "kitchen"
+    sm.userdata.features = ['gender','age']
+
     
     with sm:
         
@@ -125,9 +128,9 @@ if __name__ == '__main__':
 
 
     #constructor para bender
-    if os.environ['UCHILE_ROBOT']=="bender":
+    # if os.environ['UCHILE_ROBOT']=="bender":
         # skills = skills_base+only_bender
-        robot = robot_factory.build( skills_base , core=False)
+    robot = robot_factory.build( skills_base , core=False)
     
     robot.check()
     sm = getInstance(robot)
