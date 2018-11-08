@@ -1,0 +1,27 @@
+<launch>
+    <arg name="camera_topic" default="/camera/rgb/image_raw"/> 
+    <arg name="depth_topic" default="/camera/depth/image_raw"/> 
+    <arg name="gender" default="true"/>
+    <arg name="age" default="true"/>
+
+    
+    <!-- RGBD -->
+    <!-- <include file="$(find bender_sensors)/launch/rgbd/rgbd_head.launch" /> -->
+
+    <!-- facial features (gender, age) -->
+    <include file="$(find uchile_face_person)/face_detector/launch/facial_features.launch">
+        <arg name="gender" value="$(arg gender)"/>
+        <arg name="age"  value="$(arg age)"/>
+        <arg name="camera_topic"  value="$(arg camera_topic)"/>
+        <arg name="depth_topic"  value="$(arg depth_topic)"/>
+    </include>
+
+    <!-- facial emotions -->
+    <include file="$(find uchile_face_person)/emotion_recognition/launch/emotion_recognition.launch">
+        <arg name="camera_topic"  value="$(arg camera_topic)"/>
+    </include>
+
+    <!-- human detector -->
+    <include file="$(find uchile_person)/person_detector_hog/launch/person_detector.launch"/>
+    
+</launch>

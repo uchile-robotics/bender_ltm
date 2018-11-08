@@ -1,0 +1,21 @@
+<launch>
+    <arg name="language" default="english"/>
+    <arg name="show_subtitles" default="true"/>
+
+
+    <!-- Sound Player -->
+    <include file="$(find bender_sound)/launch/sound.launch"/>
+
+    <!-- Keyboard Interface -->
+    <include file="$(find display_interface)/launch/display_interface.launch" />
+
+    <!-- Text To Speech -->
+    <include file="$(find bender_tts)/launch/tts.launch">
+        <arg name="language"       value="$(arg language)"/>
+        <arg name="show_subtitles" value="$(arg show_subtitles)"/>
+    </include>
+
+    <!-- Speech Recognition -->
+    <!-- <include file="$(find uchile_speech_pocketsphinx)/launch/recognizer.launch" /> -->
+
+</launch>

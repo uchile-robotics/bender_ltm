@@ -1,0 +1,6 @@
+<launch>
+
+    <!-- RVIZ -->
+	<include file="$(find uchile_util)/launch/rviz.launch"/>
+
+</launch>
