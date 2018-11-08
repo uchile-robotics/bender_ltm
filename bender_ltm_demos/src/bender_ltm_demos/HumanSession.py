@@ -2,13 +2,10 @@
 import rospy
 import smach
 import smach_ros
-import os
+import ltm_addons.smach as ltm
 
 #Robot building
-if os.environ['UCHILE_ROBOT']=="bender":
-    from bender_skills import robot_factory
-else:
-    from maqui_skills import robot_factory
+from bender_skills import robot_factory
     
 # #State Machines
 from uchile_states.perception import personal_information, facial_features_recognition, emotion_recognition
@@ -19,7 +16,7 @@ from uchile_states.interaction.states import Speak
 from uchile_states.head.states import LookFront, LookHome, LookPerson, LookCrowd
 
 #LTM
-# from bender_ltm_demos import AskNameSimple
+from bender_ltm_demos import AskNameSimple
 
 #MSG
 from bender_ltm_plugins.msg import HumanEntity
@@ -38,8 +35,8 @@ class PublishInformation(smach.State):
 
         entity = HumanEntity()
         entity.name = userdata.operator_name
-        entity.face = userdata.facial_features_image
-        entity.emotion = userdate.face_emotion
+        # entity.face = userdata.facial_features_image
+        entity.emotion = userdata.face_emotion
 
         gender, phase = [0]*2
         age  = ""
@@ -58,13 +55,14 @@ class PublishInformation(smach.State):
 
                 age = age_range.strip("()")
                 age = age.replace(',','')
-                age = int(age.split(" ")[0]) + (int(age.split(" ")[1])-int(age.split(" ")[0]))/2
+
 
                 entity.age_bottom = int(age.split(" ")[0])
                 entity.age_top = int(age.split(" ")[1])
+                age = int(age.split(" ")[0]) + (int(age.split(" ")[1])-int(age.split(" ")[0]))/2
                 entity.age_avg = age
 
-                if age_bottom <= 12:
+                if entity.age_bottom <= 12:
                     entity.live_phase = HumanEntity.CHILD
                 else:
                     entity.live_phase = HumanEntity.ADULT
@@ -92,7 +90,7 @@ def getInstance(robot):
         #         'succeeded':'WAIT_OPERATOR'
         #     }
         # )
-        smach.StateMachine.add('WAIT_OPERATOR',wait_face_detection.getInstance(robot, timeout=20),
+        smach.StateMachine.add('WAIT_OPERATOR',wait_face_detection.getInstance(robot, time_out=20),
             transitions={
                 'succeeded':'GREET_OPERATOR',
                 'aborted' : 'GREET_OPERATOR',
@@ -112,7 +110,8 @@ def getInstance(robot):
 
         smach.StateMachine.add('GET_INFORMATION', facial_features_recognition.getInstance(robot),
             transitions={
-                'succeeded':'GET_EMOTION'
+                'succeeded':'GET_EMOTION',
+                'failed':'GET_EMOTION'
                 }
         )
         smach.StateMachine.add('GET_EMOTION', emotion_recognition.getInstance(robot),
@@ -128,15 +127,29 @@ def getInstance(robot):
 
 if __name__ == '__main__':
 
-    rospy.init_node('PERSONSESSION')
+    try:
+        rospy.init_node('ltm_demo__human_session')
 
-    #Only for testing 
-    # robot = robot_factory.build(["tts","audition","facial_features","neck"], core=False)
-    robot = robot_factory.build(["tts","audition","facial_features"], core=False)
+        # robot = robot_factory.build(["tts","audition","facial_features","neck"], core=False)
+        # robot = robot_factory.build(["tts","audition","facial_features","display_interface","emotion_recognition"], core=False)
+        robot = robot_factory.build(["tts", "facial_features","display_interface","emotion_recognition"], core=False)
+        robot.check()
 
-    robot.check()
 
-    sm = getInstance(robot)
-    sis = smach_ros.IntrospectionServer('personsession_server', sm, '/PERSONSESSION')
-    sis.start()
-    outcome = sm.execute()
+        # build machine
+        sm = getInstance(robot)
+        # ltm.setup(sm)
+
+        # smach introspection server
+        sis = smach_ros.IntrospectionServer('ltm_demo__human_session_sis', sm, '/SM_LTM_DEMO_HUMAN_SESSION')
+        sis.start()
+
+        # execute machine
+        sm.execute()
+
+        # Wait for ctrl-c to stop the application
+        rospy.spin()
+        sis.stop()
+
+    except rospy.ROSInterruptException:
+        pass

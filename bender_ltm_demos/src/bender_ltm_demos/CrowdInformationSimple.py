@@ -111,13 +111,7 @@ def getInstance(robot, map_filter = False, waving=False ):
 
 def main():
 
-
-    import os
-    if os.environ['UCHILE_ROBOT']=="bender":
-        from bender_skills import robot_factory
-    else:
-        from maqui_skills import robot_factory
-
+    from bender_skills import robot_factory
     rospy.init_node("crowd_information")
 
     robot = robot_factory.build([

@@ -3,8 +3,8 @@ import rospy
 import smach
 import smach_ros
 
-from uchile_states.interaction.states import Speak, Hear, Tell, NoiseCheck, KeyboardInput
-from uchile_states.interaction        import Confirmation
+from uchile_states.interaction.states import Speak, KeyboardInput #, Hear, NoiseCheck
+
 
 class SaveNameAsInformation(smach.State):
 
@@ -23,7 +23,7 @@ def getInstance(robot):
     sm.userdata.input_text = ""
 
     with sm:
-        smach.StateMachine.add('INTRODUCE',Speak(robot,text="I am "+robot.name +". Can you tell me your name?. Please "),
+        smach.StateMachine.add('INTRODUCE', Speak(robot,text="I am "+robot.name +". Can you tell me your name?. Please "),
             transitions={'succeeded':'KEYBOARD_INPUT'}
             # transitions={'succeeded':'HEAR_QUESTION'}
         )
@@ -35,50 +35,36 @@ def getInstance(robot):
                 'recognized_sentence':'recognized_sentence'
             }
         )
-        
-        smach.StateMachine.add('HEAR_QUESTION',Hear(robot,dictionary='/basic/names',web=False,timeout=10),
-            transitions={
-                'succeeded':'NOISE_CHECK',
-                'preempted':'SORRY'
-            },
-            remapping={
-                'recognized_sentence':'recognized_sentence'
-            }
-        )
-        smach.StateMachine.add('NOISE_CHECK',NoiseCheck(),
-            transitions={
-                'succeeded':'SAVE_NAME',
-                'failed':'SORRY'
-            },
-            remapping={
-                'input_text':'recognized_sentence'
-            }
-        )
-        smach.StateMachine.add('CONFIRM_NAME',Confirmation.getInstance(robot,text="Your name is"),
-            transitions={
-                'yes'    :'SAVE_NAME',
-                'no'     :'NAME_NO',
-                'aborted':'SORRY'
-            },
-            remapping={
-                'confirmation_text':'recognized_sentence'
-            }
-        )
-        smach.StateMachine.add('NAME_NO',Speak(robot,text="So, what is your name?"),
-            transitions={
-                'succeeded':'HEAR_QUESTION'
-            }
-        )
+
         smach.StateMachine.add('SAVE_NAME',SaveNameAsInformation(),
             transitions={
                 'succeeded':'succeeded'
             }
         )
-        smach.StateMachine.add('SORRY',Speak(robot,text="I am sorry, I couldn't hear you. Can you repeat your name please?"),
-            transitions={
-                'succeeded':'HEAR_QUESTION'
-            }
-        )
+        
+        # smach.StateMachine.add('HEAR_QUESTION',Hear(robot,dictionary='/basic/names'),
+        #     transitions={
+        #         'succeeded':'NOISE_CHECK',
+        #         'preempted':'SORRY'
+        #     },
+        #     remapping={
+        #         'recognized_sentence':'recognized_sentence'
+        #     }
+        # )
+        # smach.StateMachine.add('NOISE_CHECK',NoiseCheck(),
+        #     transitions={
+        #         'succeeded':'SAVE_NAME',
+        #         'failed':'SORRY'
+        #     },
+        #     remapping={
+        #         'input_text':'recognized_sentence'
+        #     }
+        # )
+        # smach.StateMachine.add('SORRY',Speak(robot,text="I am sorry, I couldn't hear you. Can you repeat your name please?"),
+        #     transitions={
+        #         'succeeded':'HEAR_QUESTION'
+        #     }
+        # )
 
     return sm
 
@@ -86,15 +72,13 @@ def getInstance(robot):
 
 if __name__ == '__main__':
 
-    import os
-    if os.environ['UCHILE_ROBOT']=="bender":
-        from bender_skills import robot_factory
-    else:
-        from maqui_skills import robot_factory
+    from bender_skills import robot_factory
 
     rospy.init_node('ask_name_simple')
-    robot = robot_factory.build(["tts","audition"],core=False)
+    # robot = robot_factory.build(["tts","audition"],core=False)
+    robot = robot_factory.build(["tts"], core=False)
 
     robot.check()
     sm = getInstance(robot)
     outcome = sm.execute()
+
