@@ -5,8 +5,10 @@
     <arg name="age" default="true"/>
     <arg name="display" default="false"/>
     
-    <!-- RGBD -->
-    <!-- <include file="$(find bender_sensors)/launch/rgbd/rgbd_head.launch" /> -->
+    <!-- RGBD HEAD -->
+    <!-- <include file="$(find bender_sensors)/launch/rgbd/rgbd_head.launch">
+        <arg name="device" value="kinect"/>
+    </include> -->
 
     <!-- facial features (gender, age) -->
     <include file="$(find uchile_face_person)/face_detector/launch/facial_features.launch">

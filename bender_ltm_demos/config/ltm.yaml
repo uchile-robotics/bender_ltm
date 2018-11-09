@@ -55,7 +55,7 @@ plugins:
       class: "bender_ltm_plugins::HumanEntityPlugin"
       type: "human"
       collection: "human"
-      topic: "/robot/fake_short_term_memory/human/updates"
+      topic: "/bender/ltm/entity/human/update"
 
 
     # ObjectsEntityPlugin
@@ -63,5 +63,5 @@ plugins:
       class: "bender_ltm_plugins::CrowdEntityPlugin"
       type: "crowd"
       collection: "crowd"
-      topic: "/robot/fake_short_term_memory/crowd/updates"
+      topic: "/bender/ltm/entity/crowd/update"
 

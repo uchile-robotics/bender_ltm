@@ -65,6 +65,7 @@ namespace bender_ltm_plugins
     private:
         void callback(const EntityMsg &msg);
         void build_null(EntityMsg &entity);
+        uint32_t lookup_uid(std::string name);
 
     public:
         std::string get_type();

@@ -22,7 +22,7 @@ namespace bender_ltm_plugins
         build_null(_null_e);
 
         // all fields
-        _field_names.insert("name");
+        _field_names.insert("name"); // STATIC FIELD
         _field_names.insert("age_bottom");
         _field_names.insert("age_top");
         _field_names.insert("age_avg");
@@ -34,7 +34,7 @@ namespace bender_ltm_plugins
 
         // parameters
         ltm::util::ParameterServerWrapper psw("~");
-        psw.getParameter(param_ns + "topic", _stm_topic, "/bender/ltm/entity/person/update");
+        psw.getParameter(param_ns + "topic", _stm_topic, "/bender/ltm/entity/human/update");
 
         ros::NodeHandle priv("~");
         _sub = priv.subscribe(_stm_topic, 1, &HumanEntityPlugin::callback, this);
@@ -144,10 +144,36 @@ namespace bender_ltm_plugins
         this->update(msg);
     }
 
+    uint32_t HumanEntityPlugin::lookup_uid(std::string name) {
+        /* lookups the uid of an existent entity, returns a new one if not found */
+        std::string json = "{name: \"" + name + "\"}";
+        ltm::QueryServer::Response res;
+
+        // known person
+        if (this->ltm_query(json, res, false) 
+            && res.entities.size() > 0 
+            && res.entities[0].uids.size() > 0) {
+            return res.entities[0].uids[0];
+        }
+        
+        // create new uid
+        int value;
+        while (true) {
+            value = this->ltm_generate_uid();
+            if (!this->ltm_has(value)) return value;
+        }
+    }
+
     void HumanEntityPlugin::update(const EntityMsg& msg) {
+        /* ENTITIES ARE IDENTIFIED BY THEIR NAME (USE UID IF AVAILABLE) */
+        if (msg.name == "" && msg.meta.uid == 0) {
+            ROS_WARN_STREAM("Invalid human update message. Missing uid or name field.");
+        }
+        uint32_t uid = (msg.meta.uid > 0) ? msg.meta.uid : lookup_uid(msg.name);
+
         // KEYS
         LogType log;
-        log.entity_uid = msg.meta.uid;
+        log.entity_uid = uid;
         log.log_uid = (uint32_t) this->ltm_reserve_log_uid();
 
         // WHEN
@@ -161,11 +187,11 @@ namespace bender_ltm_plugins
         // TODO: WE CAN USE A CACHE FOR RECENT ENTITIES
         EntityMsg curr = _null_e;
         EntityWithMetadataPtr curr_with_md;
-        curr.meta.uid = msg.meta.uid;
+        curr.meta.uid = uid;
         curr.meta.log_uid = log.log_uid;
-        bool uid_exists = this->ltm_get_last(msg.meta.uid, curr_with_md);
+        bool uid_exists = this->ltm_get_last(uid, curr_with_md);
         if (uid_exists) {
-            curr.name = curr_with_md->name;
+            curr.name = curr_with_md->name; // STATIC            
             curr.age_bottom = curr_with_md->age_bottom;
             curr.age_top = curr_with_md->age_top;
             curr.age_avg = curr_with_md->age_avg;
@@ -174,6 +200,10 @@ namespace bender_ltm_plugins
             curr.face = curr_with_md->face;
             curr.emotion = curr_with_md->emotion;
             curr.last_seen = curr_with_md->last_seen;
+
+            // initial values
+            curr.meta.init_log = curr_with_md->meta.init_log;
+            curr.meta.init_stamp = curr_with_md->meta.init_stamp;
         } else {
             // NEW ENTITY
             curr.meta.init_log = curr.meta.log_uid;
@@ -199,16 +229,17 @@ namespace bender_ltm_plugins
         size_t n_updated = log.updated_f.size();
         size_t n_removed = log.removed_f.size();
         if ((n_added + n_updated + n_removed) == 0) {
-            ROS_DEBUG_STREAM(_log_prefix << "Received update for entity (" << msg.meta.uid << ") does not apply any changes.");
+            ROS_DEBUG_STREAM(_log_prefix << "Received update for entity (" << uid << ") does not apply any changes.");
             return;
         }
-        ROS_DEBUG_STREAM(_log_prefix << "Received update for entity (" << msg.meta.uid << ") info: add=" << n_added << ", update=" << n_updated << ", removed=" << n_removed << ".");
-        ROS_DEBUG_STREAM_COND(n_added > 0, _log_prefix << " - ADD fields for (" << msg.meta.uid << "): " << entity::build_log_vector(log.new_f) << ".");
-        ROS_DEBUG_STREAM_COND(n_updated > 0, _log_prefix << " - UPDATE fields for (" << msg.meta.uid << "): " << entity::build_log_vector(log.updated_f) << ".");
-        ROS_DEBUG_STREAM_COND(n_removed > 0, _log_prefix << " - REMOVE fields for (" << msg.meta.uid << "): " << entity::build_log_vector(log.removed_f) << ".");
+        ROS_DEBUG_STREAM(_log_prefix << "Received update for entity (" << uid << ") info: add=" << n_added << ", update=" << n_updated << ", removed=" << n_removed << ".");
+        ROS_DEBUG_STREAM_COND(n_added > 0, _log_prefix << " - ADD fields for (" << uid << "): " << entity::build_log_vector(log.new_f) << ".");
+        ROS_DEBUG_STREAM_COND(n_updated > 0, _log_prefix << " - UPDATE fields for (" << uid << "): " << entity::build_log_vector(log.updated_f) << ".");
+        ROS_DEBUG_STREAM_COND(n_removed > 0, _log_prefix << " - REMOVE fields for (" << uid << "): " << entity::build_log_vector(log.removed_f) << ".");
 
         // SAVE LOG AND DIFF INTO COLLECTION
         this->ltm_log_insert(log);
+        diff.name = curr.name; // ENSURE THIS FIELD IS SAVED IN DIFF
         this->ltm_diff_insert(diff);
 
         // UPDATE CURRENT ENTITY
@@ -313,7 +344,7 @@ namespace bender_ltm_plugins
     void HumanEntityPlugin::retrace_retrieve_field(const std::string& name, EntityWithMetadataPtr &in, EntityMsg &out) {
         EntityMsg _in = *in;
 
-        if (name == "name") { out.name = _in.name; }
+        if (name == "name") { out.name = _in.name; } // STATIC FIELD
         else if (name == "genre") { out.genre = _in.genre; }
         else if (name == "age_bottom") { out.age_bottom = _in.age_bottom; }
         else if (name == "age_top") { out.age_top = _in.age_top; }
@@ -325,7 +356,7 @@ namespace bender_ltm_plugins
     }
 
     void HumanEntityPlugin::build_null(EntityMsg &entity) {
-        entity.name = "";
+        entity.name = ""; // STATIC FIELD
         entity.genre = 0;
         entity.age_bottom = 0;
         entity.age_top = 0;

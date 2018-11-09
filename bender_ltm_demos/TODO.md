@@ -3,12 +3,9 @@
 
 ## Important
 
-- HumanSession as LTM episodes
-	+ Smach Viewer Image for printing
+- (OK) HumanSession as LTM episodes
 
-- HumanEntity Plugin
-	+ Data collection
-	+ Data processing
+- (OK) HumanEntity Plugin
 
 - CrowdSession
 	+ Review and test code
@@ -27,7 +24,9 @@
 - Robot Interview Session
 
 - Write document
+	+ Smach Viewer Image for printing
 
+- CAPACIDAD DE ACTUALIZAR PARCIAL O TOTALMENTE UNA ENTIDAD. 
 
 ## Improve
 
