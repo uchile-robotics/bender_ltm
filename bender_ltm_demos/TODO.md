@@ -32,5 +32,3 @@
 ## Improve
 
 - Human Session modify routine if person is already known
-- Keyboard Interface opens a new/clean terminal window.
-- Show timeouts counter in new window.
