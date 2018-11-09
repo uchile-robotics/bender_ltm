@@ -1,6 +1,6 @@
 <launch>
     <arg name="language" default="english"/>
-    <arg name="show_subtitles" default="true"/>
+    <arg name="show_subtitles" default="false"/>
 
 
     <!-- Sound Player -->
