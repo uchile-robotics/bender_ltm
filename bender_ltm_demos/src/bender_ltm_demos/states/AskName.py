@@ -19,7 +19,8 @@ class SaveNameAsInformation(smach.State):
     def execute(self, userdata):
         name = userdata.recognized_sentence
         userdata.operator_name = name
-        self.robot.say("Nice to meet you " + name + ".")
+        self.robot.say("nice to meet you " + name)
+        self.robot.tts.wait_until_done(timeout=4.0)
         return "succeeded"
 
 
@@ -37,14 +38,11 @@ def getInstance(robot):
         smach.StateMachine.add(
             'KEYBOARD_INPUT',
             KeyboardInput(robot),
-            transitions={'succeeded': 'SAVE_NAME'}
-        )
+            transitions={'succeeded': 'SAVE_NAME'})
 
         smach.StateMachine.add(
             'SAVE_NAME',
-            SaveNameAsInformation(robot),
-            transitions={'succeeded': 'succeeded'}
-        )
+            SaveNameAsInformation(robot))
 
     return sm
 

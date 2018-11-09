@@ -4,10 +4,6 @@
 ## Important
 
 - HumanSession as LTM episodes
-	+ Add dummy episodes
-	+ Add SMACH interface
-	+ Collect episodes
-	+ Publish Information at each step
 	+ Smach Viewer Image for printing
 
 - HumanEntity Plugin
@@ -38,8 +34,3 @@
 - Human Session modify routine if person is already known
 - Keyboard Interface opens a new/clean terminal window.
 - Show timeouts counter in new window.
-
-
-## DONE
-
-- Avoid perception windows

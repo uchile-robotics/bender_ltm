@@ -123,13 +123,15 @@ class SayHumanResults(smach.State):
         goodbye = "It seems you are a " + genre + " human"
         goodbye += " between " + str(entity.age_bottom) + " and " + str(entity.age_top) + " years"
         goodbye += ", so you are " + phase + " ."
-        goodbye += " Thank you very much " + entity.name + ", see you later."
-        robot.tts.say(goodbye)
+        goodbye += " Thank you very much " + entity.name + ", see you later"
+        self.robot.tts.say(goodbye)
+        self.robot.tts.wait_until_done(timeout=10.0)
         return 'succeeded'
 
 
 def build_wait_human_sm(robot):
     sm = smach.StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
+    ltm.register_state(sm, ["wait_for_human"])
     with sm:
         # smach.StateMachine.add(
         #     'POSITION_HEAD',
@@ -144,7 +146,7 @@ def build_introduction_sm(robot):
     sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
         output_keys=['human'])
-
+    ltm.register_state(sm, ["hri_introduction"])
     with sm:
         smach.StateMachine.add(
             'SAY_HELLO',
@@ -169,17 +171,19 @@ def build_facial_features_sm(robot):
         input_keys=['human'],
         output_keys=['human'])
     sm.userdata.features = ['gender', 'age']
+    ltm.register_state(sm, ["facial_analysis"])
 
     with sm:
         smach.StateMachine.add(
-            'SAY_HELLO',
+            'INIT',
             Speak(robot, text="Please, look me in the eyes ..."),
-            transitions={'succeeded': 'GET_AGE_AND_GENRE'}
-        )
+            transitions={'succeeded': 'GET_AGE_AND_GENRE'})
 
+        age_genre_sm = facial_features_recognition.getInstance(robot)
+        ltm.register_state(age_genre_sm, ["age_estimation", "genre_estimation"])
         smach.StateMachine.add(
             'GET_AGE_AND_GENRE',
-            facial_features_recognition.getInstance(robot),
+            age_genre_sm,
             transitions={
                 'succeeded': 'RECORD_AGE_AND_GENRE',
                 'failed': 'RECORD_AGE_AND_GENRE'
@@ -190,14 +194,16 @@ def build_facial_features_sm(robot):
             RecordHumanAgeAndGenre(),
             transitions={'succeeded': 'GET_EMOTION'})
 
+        emotion_sm = emotion_recognition.getInstance(robot)
+        ltm.register_state(emotion_sm, ["emotion_estimation"])
         smach.StateMachine.add(
             'GET_EMOTION',
-            emotion_recognition.getInstance(robot),
+            emotion_sm,
             transitions={
                 'succeeded': 'RECORD_EMOTION',
                 'failed': 'RECORD_EMOTION'
-            }
-        )
+            })
+
         smach.StateMachine.add(
             'RECORD_EMOTION',
             RecordHumanEmotion(),
@@ -209,6 +215,7 @@ def build_goodbye_sm(robot):
     sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
         input_keys=['human'])
+    ltm.register_state(sm, ["hri_goodbye"])
 
     with sm:
         smach.StateMachine.add(
@@ -220,7 +227,7 @@ def build_goodbye_sm(robot):
 
 def getInstance(robot):
     sm = smach.StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
-
+    ltm.register_state(sm, ["ltm_demo", "human_session"])
     with sm:
         smach.StateMachine.add(
             'WAIT_HUMAN',
@@ -230,10 +237,10 @@ def getInstance(robot):
         smach.StateMachine.add(
             'INTRODUCTION',
             build_introduction_sm(robot),
-            transitions={'succeeded': 'ANALIZE_FACIAL_FEATURES'})
+            transitions={'succeeded': 'ANALYZE_FACIAL_FEATURES'})
 
         smach.StateMachine.add(
-            'ANALIZE_FACIAL_FEATURES',
+            'ANALYZE_FACIAL_FEATURES',
             build_facial_features_sm(robot),
             transitions={'succeeded': 'GOODBYE'})
 
