@@ -3,7 +3,9 @@
 
 #include <ros/ros.h>
 #include <ltm/plugin/location_base.h>
-#include <ltm/GetEpisodes.h>
+#include <uchile_srvs/ValidPoint.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/Point.h>
 
 namespace bender_ltm_plugins
 {
@@ -23,10 +25,21 @@ namespace bender_ltm_plugins
         void reset();
 
     private:
-        ros::ServiceClient client;
-        std::map<uint32_t, ros::Time> registry;
-        bool initialized;
-        std::string log_prefix;
+        bool _initialized;
+        std::string _log_prefix;
+
+        // Collect position through geometry_msgs::PoseWithCovarianceStamped msgs.
+        std::string _pose_topic;
+        ros::Subscriber _pose_sub;
+        geometry_msgs::Point _robot_position;
+        std::string _robot_position_frame_id;
+        bool _first_pose_msg;
+
+        // Collect location names through a ServiceClient using uchile_srvs::ValidPoint srvs.
+        std::string _location_service;
+        ros::ServiceClient _location_client;
+
+        void pose_callback(const geometry_msgs::PoseWithCovarianceStamped &msg);
         bool reinitialize();
     };
 

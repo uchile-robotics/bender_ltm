@@ -28,6 +28,9 @@ plugins:
   location:
     # Class to load through pluginlib
     class: "bender_ltm_plugins::LocationPlugin"
+    pose_topic: "/bender/nav/amcl_pose"
+    location_service: "/bender/knowledge/map_analyzer/check_point_inside_map"
+
 
   # Stream plugins
   streams:

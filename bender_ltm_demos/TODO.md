@@ -7,27 +7,27 @@
 
 - (OK) HumanEntity Plugin
 
-- CrowdSession
-	+ Review and test code
-	+ Session as LTM episodes
-	+ plugin
-
-- Test with real robot items
-	+ RGBD
-	+ Navigation
-	+ Neck
-
 - Location Plugin
 
 - Emotions Plugin
 
 - Robot Interview Session
 
+- CrowdSession
+    + Review and test code
+    + Session as LTM episodes
+    + plugin
+
+- Test with real robot items
+    + RGBD
+    + Navigation
+    + Neck
+
 - Write document
 	+ Smach Viewer Image for printing
 
-- CAPACIDAD DE ACTUALIZAR PARCIAL O TOTALMENTE UNA ENTIDAD. 
 
 ## Improve
 
+- Capacidad de actualizar parcial o totalmente una entidad. 
 - Human Session modify routine if person is already known

@@ -61,7 +61,7 @@ namespace bender_ltm_plugins
     }
 
     void HumanEntityPlugin::collect(uint32_t uid, ltm::What &msg, ros::Time _start, ros::Time _end) {
-        ROS_WARN_STREAM(_log_prefix << "Collecting Human entities for episode " << uid << ".");
+        ROS_INFO_STREAM(_log_prefix << "Collecting Human entities for episode " << uid << ".");
 
         // TODO: mutex (it is not required, because we are using a single-threaded Spinner for callbacks)
 
@@ -92,7 +92,7 @@ namespace bender_ltm_plugins
         }
 
         // SAVE IT
-        ROS_WARN_STREAM(_log_prefix << "Collected (" << episode_registry.size() << ") Human entities and (" << logcnt << ") logs for episode " << uid << ".");
+        ROS_INFO_STREAM(_log_prefix << "Collected (" << episode_registry.size() << ") Human entities and (" << logcnt << ") logs for episode " << uid << ".");
         for (m_it = episode_registry.begin(); m_it != episode_registry.end(); ++m_it) {
             msg.entities.push_back(m_it->second);
         }
