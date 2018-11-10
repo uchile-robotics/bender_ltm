@@ -11,6 +11,7 @@ namespace bender_ltm_plugins
 
         // parameters
         ltm::util::ParameterServerWrapper psw("~");
+        psw.getParameter(param_ns + "map_name", _map_name, "amtc");
         psw.getParameter(param_ns + "pose_topic", _pose_topic, "/bender/nav/amcl_pose");
         psw.getParameter(param_ns + "location_service", _location_service, "/bender/knowledge/map_analyzer/check_point_inside_map");
 
@@ -59,7 +60,7 @@ namespace bender_ltm_plugins
             return;
         }
 
-        where.map_name = "TODO"; // GET FROM PARAMETER SERVER
+        where.map_name = _map_name;
         where.position = _robot_position;
         where.frame_id = _robot_position_frame_id;
 

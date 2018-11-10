@@ -28,6 +28,7 @@ plugins:
   location:
     # Class to load through pluginlib
     class: "bender_ltm_plugins::LocationPlugin"
+    map_name: "amtc"
     pose_topic: "/bender/nav/amcl_pose"
     location_service: "/bender/knowledge/map_analyzer/check_point_inside_map"
 
@@ -51,7 +52,8 @@ plugins:
   entities:
     # List of names to consider. 
     # For each name, you must declare its class and ROS parameters.
-    include: ["human", "crowd"]
+    # include: ["human", "crowd"]
+    include: ["human"]
 
     # PeopleEntityPlugin
     human:

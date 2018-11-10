@@ -29,6 +29,7 @@ namespace bender_ltm_plugins
         std::string _log_prefix;
 
         // Collect position through geometry_msgs::PoseWithCovarianceStamped msgs.
+        std::string _map_name;
         std::string _pose_topic;
         ros::Subscriber _pose_sub;
         geometry_msgs::Point _robot_position;
