@@ -3,7 +3,6 @@
 
 #include <ros/ros.h>
 #include <ltm/plugin/emotion_base.h>
-#include <ltm/GetEpisodes.h>
 
 namespace bender_ltm_plugins
 {
@@ -23,10 +22,8 @@ namespace bender_ltm_plugins
         void reset();
 
     private:
-        ros::ServiceClient client;
-        std::map<uint32_t, ros::Time> registry;
-        bool initialized;
-        std::string log_prefix;
+        bool _initialized;
+        std::string _log_prefix;
         bool reinitialize();
     };
 

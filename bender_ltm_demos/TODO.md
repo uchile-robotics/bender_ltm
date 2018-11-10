@@ -7,9 +7,9 @@
 
 - (OK) HumanEntity Plugin
 
-- Location Plugin
+- (OK) Location Plugin
 
-- Emotions Plugin
+- (OK) Dummy Emotions Plugin
 
 - Robot Interview Session
 
@@ -25,9 +25,16 @@
 
 - Write document
 	+ Smach Viewer Image for printing
+    + Revisar Where simple o múltiple
+    + Sobre Registro: is_leaf
+    + 
 
 
 ## Improve
 
+- Plugin Emociones REAL
 - Capacidad de actualizar parcial o totalmente una entidad. 
 - Human Session modify routine if person is already known
+- Where múltiple.
+- Relevancia generalizada.
+
