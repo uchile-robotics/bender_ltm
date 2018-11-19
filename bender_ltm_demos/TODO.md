@@ -12,6 +12,8 @@
 - (OK) Dummy Emotions Plugin
 
 - Robot Interview Session
+    + Queries
+    + Robot Skill
 
 - CrowdSession
     + Review and test code

@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+__author__ = 'Matías Pavez'
+__email__ = 'matias.pavez@ing.uchile.cl'
+
 import os
 import rospy
 import smach

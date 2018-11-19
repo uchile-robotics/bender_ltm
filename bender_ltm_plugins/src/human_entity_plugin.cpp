@@ -178,8 +178,6 @@ namespace bender_ltm_plugins
 
         // WHEN
         log.timestamp = ros::Time::now();
-        log.prev_log = (uint32_t) this->ltm_get_last_log_uid(log.entity_uid);
-        // log.next_log = 0;
 
         // WHO
         this->ltm_get_registry(log.episode_uids);
@@ -209,6 +207,7 @@ namespace bender_ltm_plugins
             curr.meta.init_log = curr.meta.log_uid;
             curr.meta.init_stamp = log.timestamp;
         }
+        curr.last_seen = log.timestamp;
         curr.meta.stamp = log.timestamp;
         curr.meta.last_log = log.log_uid;
         curr.meta.last_stamp = log.timestamp;
