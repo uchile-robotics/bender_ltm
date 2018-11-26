@@ -1,0 +1,26 @@
+<launch>
+
+    <!-- Rosaria -->
+    <include file="$(find bender_base)/launch/base.launch"/>
+
+    <!--  hokuyo -->
+    <node name="laser_front" pkg="urg_node" type="urg_node" respawn="true" ns="/bender/sensors/">
+        <rosparam command="load" file="$(find bender_ltm_demos)/config/hokuyo.yaml"/>
+        <remap from="scan"         to="/bender/sensors/laser_front/scan"/>
+        <remap from="laser_status" to="/bender/sensors/laser_front/status"/>
+        <remap from="update_laser_status" to="/bender/sensors/laser_front/update_status"/>
+    </node>
+
+    <!-- ================================= -->
+    <!-- == FACE, NECK == -->
+    <!-- ================================= -->
+
+    <!-- face -->
+    <!-- TODO -->
+
+    <!-- neck -->
+    <!-- TODO -->
+    <!-- ARMs and HEAD controllers -->
+    <!-- <include file="$(find bender_arm)/launch/arms.launch" /> -->
+
+</launch>
