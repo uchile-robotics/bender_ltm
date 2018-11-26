@@ -3,7 +3,6 @@
 __author__ = 'Matías Pavez'
 __email__ = 'matias.pavez@ing.uchile.cl'
 
-import time
 import rospy
 
 # robot
@@ -13,112 +12,106 @@ from bender_skills import robot_factory
 from bender_ltm_plugins.msg import HumanEntity
 from bender_ltm_plugins.msg import CrowdEntity
 
+# util
+from RecallUtils import *
+
 
 def stream_review(robot):
     """
-    - Lugar X, Fecha X: Streams
-    - TAG X: Stream
+    - known streams types
+    - last recorded stream
+    - Episode e1: saved streams
+    - random what + stream
+    - random when + stream
+    - random where + stream
     """
     pass
 
 
 def episode_review(robot):
     """
-    - Lugar X: Episodios
-    - Fecha X: Episodios
+    - known tags (heavy)
+    - by tag
+    - by entity type
+    - by entity type and uid
+    - by stream type
     """
-    pass
+    print " ======== BY TAG =========="
+    tag = "hri_introduction"
+    episodes = robot.ltm.get_episodes_by_tag(tag=tag)
+    print " == tag: " + tag + " ==="
+    print_episodes(episodes)
+
+    tag = "genre_estimation"
+    episodes = robot.ltm.get_episodes_by_tag(tag=tag)
+    print " == tag: " + tag + " ==="
+    print_episodes(episodes)
+
+    print " ======== BY ENTITY TYPE =========="
+    episodes = robot.ltm.get_episodes_by_entity_type(entity_type="human")
+    print " == entity_type: human ==="
+    print_episodes(episodes)
+
+    print " ======== BY ENTITY TYPE AND UID =========="
+    human_uids = robot.ltm.query_entity_human("")
+    entity_uid = human_uids[0]
+    episodes = robot.ltm.get_episodes_by_entity_uid(entity_type="human", entity_uid=entity_uid)
+    print " == type: human, entity_uid: " + str(entity_uid) + " ==="
+    print_episodes(episodes)
+
+    print " ======== BY STREAM TYPE =========="
+    episodes = robot.ltm.get_episodes_by_stream_type(stream_type="images")
+    print " == stream_type: images ==="
+    print_episodes(episodes)
+
+    print " ======== BY STREAM TYPE AND UID =========="
+    images_uids = robot.ltm.query_stream_images("")
+    stream_uid = images_uids[0]
+    episodes = robot.ltm.get_episodes_by_stream_uid(stream_type="images", stream_uid=stream_uid)
+    print " == type: images, stream_uid: " + str(stream_uid) + " ==="
+    print_episodes(episodes)
 
 
 def when_review(robot):
     """
-    - que pasó
-    - donde estuvo
-    - que aprendió durante el intervalo de tiempo X sobre humanos
+    (What, Where, Entities, learned data)
+    - First episode
+    - Last episode
+    - Middle time episode
+    - time span
     """
     pass
 
 
 def where_review(robot):
     """
-    - última fecha
-    - primera vez
-    - fecha particular
+    - known places (heavy)
+    - by place: list what, when
     """
-    pass
+    episodes = robot.ltm.get_episodes_by_where(location="dining_room", area="inside_map")
+    print " == location: dining_room, area: inside_map ==="
+    print_episodes(episodes)
 
+    print " == area: inside_map ==="
+    episodes = robot.ltm.get_episodes_by_where(area="inside_map")
+    print_episodes(episodes)
 
-def aggregation_review(robot):
-    """
-    - TEMPORAL
-    - LUGAR
-    - WHAT
-    - ENTIDAD
-    """
-    pass
-
-
-def print_human(human):
-    genre = "unkown genre"
-    if human.genre is human.MASCULINE:
-        genre = "male"
-    elif human.genre is human.FEMININE:
-        genre = "female"
-
-    phase = "unkown phase"
-    if human.live_phase is human.CHILD:
-        phase = "child"
-    elif human.live_phase is human.ADULT:
-        phase = "adult"
-
-    age = str(human.age_avg) if human.age_avg is not 0 else "unknown age"
-    print human.name + " (" + age + ") " + genre + ", " + phase
-
-
-def print_humans(humans):
-    print "---"
-    for human in humans:
-        print_human(human)
-    print "---"
-
-
-def get_attr_lst(lst, name):
-    return map(lambda x: getattr(x, name), lst)
-
-
-def fmt_stamp(stamp):
-    return time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime(stamp.secs))
-
-
-def print_stamped_information(robot, uid, stamp):
-    human = robot.ltm.get_human_entity(uid, stamp)
-    print_human(human)
-
-    episodes = robot.ltm.get_episodes_by_stamp(stamp)
-    episodes = robot.ltm.filter_children(episodes)
-    tags = []
-    for ep in episodes:
-        tags += ep.tags
-        tags += ep.children_tags
-    tags = list(set(tags))
-
-    episodes = robot.ltm.sort_by_duration(episodes)
-    location = "unknown location"
-    for ep in episodes:
-        location = ep.where.location + " (" + ep.where.area + ")"
-    print " - what : " + str(tags)
-    print " - when : " + fmt_stamp(stamp)
-    print " - where: " + location
+    print " == area: outside_map ==="
+    episodes = robot.ltm.get_episodes_by_where(area="outside_map")
+    print_episodes(episodes)
 
 
 def entity_review(robot):
     """
-    - A: nombres de humanos que conoce
-    - B: primera vez que lo vió (donde y cuando)
-    - C: última vez que lo vió y (datos, donde y cuando)
-    - D: conocimiento sobre él, en el intante X (cuando, donde, datos)
+    - A: Overview of known humans: name, age, genre, phase.
+    - B: About H1 - First record: What, When, Where.
+    - C: About H1 - Last record: What, When, Where.
+    - D: About H1 - Knowledge at middle time: What, When, Where.
+    - E: About H1: Field modification: When, value.
     """
-    # known humans
+    # - - - - - - - - - - - - - - - - - - - - - - - -
+    # A.- Overview
+    print "\n\n=== Test A ===\n"
     human_uids = robot.ltm.query_entity_human("")
     if not human_uids:
         print "I do not known any human yet."
@@ -130,25 +123,40 @@ def entity_review(robot):
     names = get_attr_lst(humans, "name")
     print names
 
+    # - - - - - - - - - - - - - - - - - - - - - - - -
     # select first human
     a_human = humans[0]
     a_uid = a_human.meta.uid
     print_human(a_human)
 
-    # Episodic Information: First Time, WHAT, WHERE, WHEN
+    # - - - - - - - - - - - - - - - - - - - - - - - -
+    # B.- First Record
+    print "\n\n=== Test B ===\n"
     first_stamp = a_human.meta.init_stamp
-    print "\nFirst record: "
+    print "First record: "
     print_stamped_information(robot, a_uid, first_stamp)
 
-    # Episodic Information: Last Time, WHAT, WHERE, WHEN
+    # - - - - - - - - - - - - - - - - - - - - - - - -
+    # C.- Last Record
+    print "\n\n=== Test C ===\n"
     last_stamp = a_human.meta.last_stamp
-    print "\nLast record: "
+    print "Last record: "
     print_stamped_information(robot, a_uid, last_stamp)
 
-    # When some field was modified and field value
+    # - - - - - - - - - - - - - - - - - - - - - - - -
+    # C.- Middle knowledge (in time)
+    print "\n\n=== Test D ===\n"
+    middle_stamp = rospy.Time()
+    middle_stamp.secs = (first_stamp.secs + last_stamp.secs) / 2
+    print "Middle record: "
+    print_stamped_information(robot, a_uid, middle_stamp)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - -
+    # E.- When some field was modified and field value
+    print "\n\n=== Test E ===\n"
     field_name = "emotion"
     log_uids = robot.ltm.get_human_change_logs(a_uid, field_name)
-    if log_uids:  
+    if log_uids:
         logs = robot.ltm.get_human_entity_logs(log_uids)
         trails = robot.ltm.get_human_entity_trails(log_uids)
         for log_uid in log_uids:
@@ -162,14 +170,26 @@ def entity_review(robot):
         print " - the '" + field_name + "' field does not exist or has never changed."
 
 
+def review_runner(label, robot, func):
+    print "\n\n\n"
+    print " ============================================= "
+    print " - " + label.upper()
+    print " ============================================= "
+    func(robot)
+
+
 def main():
     # robot = robot_factory.build(["tts", "ltm"], core=False)
     # robot.say("Hello, i am bender")
     # robot.tts.wait_until_done()
     robot = robot_factory.build(["ltm"], core=False)
 
-    # TODO: Armar historia para mostrar
-    entity_review(robot)
+    # TODO: Armar historia para mostrar    
+    review_runner("where", robot, where_review)
+    review_runner("when", robot, when_review)
+    review_runner("entity", robot, entity_review)
+    review_runner("stream", robot, stream_review)
+    review_runner("episode", robot, episode_review)
 
 
 if __name__ == '__main__':
