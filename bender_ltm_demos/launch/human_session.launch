@@ -1,0 +1,21 @@
+<launch>
+    
+    <!-- Robot -->
+    <include file="$(find bender_ltm_demos)/launch/modules/robot.xml"/>
+
+    <!-- localization -->
+    <include file="$(find bender_ltm_demos)/launch/modules/localization.xml"/>
+
+    <!-- Knowledge -->
+    <include file="$(find bender_ltm_demos)/launch/modules/knowledge.xml"/>
+
+    <!-- HRI -->
+    <include file="$(find bender_ltm_demos)/launch/modules/hri.xml"/>
+        
+    <!-- Perception -->
+    <include file="$(find bender_ltm_demos)/launch/modules/perception.xml"/>
+
+    <!-- visualization -->
+    <!-- <include file="$(find bender_ltm_demos)/launch/visualization.xml"/> -->
+
+</launch>

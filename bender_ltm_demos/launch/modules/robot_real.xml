@@ -11,6 +11,11 @@
         <remap from="update_laser_status" to="/bender/sensors/laser_front/update_status"/>
     </node>
 
+    <!-- RGBD HEAD -->
+    <include file="$(find bender_sensors)/launch/rgbd/rgbd_head.launch">
+        <!-- <arg name="device" value="kinect"/> -->
+    </include>
+
     <!-- ================================= -->
     <!-- == FACE, NECK == -->
     <!-- ================================= -->

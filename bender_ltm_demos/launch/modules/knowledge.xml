@@ -6,4 +6,7 @@
     <!-- Mapper -->
     <include file="$(find uchile_util)/launch/mapper.launch"/>
 
+    <!-- LTM -->
+    <include file="$(find bender_ltm_demos)/launch/modules/ltm.xml"/>
+
 </launch>

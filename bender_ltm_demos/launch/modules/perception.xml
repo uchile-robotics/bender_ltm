@@ -2,16 +2,9 @@
 
     <arg name="camera_topic" default="/bender/sensors/rgbd_head/rgb/image_raw"/> 
     <arg name="depth_topic" default="/bender/sensors/rgbd_head/depth/image_raw"/> 
-    <!-- <arg name="camera_topic" default="/camera/rgb/image_raw"/>  -->
-    <!-- <arg name="depth_topic" default="/camera/depth/image_raw"/>  -->
     <arg name="gender" default="true"/>
     <arg name="age" default="true"/>
-    <arg name="display" default="false"/>
-    
-    <!-- RGBD HEAD -->
-    <include file="$(find bender_sensors)/launch/rgbd/rgbd_head.launch">
-        <!-- <arg name="device" value="kinect"/> -->
-    </include>
+    <arg name="display" default="false"/>    
 
     <!-- facial features (gender, age) -->
     <include file="$(find uchile_face_person)/face_detector/launch/facial_features.launch">

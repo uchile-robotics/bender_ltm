@@ -8,12 +8,9 @@ from bender_ltm_plugins.msg import HumanEntity
 
 # State Machines
 from uchile_states.interaction.states import Speak
-from uchile_states.perception import personal_information
 from uchile_states.perception import facial_features_recognition
 from uchile_states.perception import emotion_recognition
 from uchile_states.perception import wait_face_detection
-# from uchile_states.head.states import LookFront
-# from uchile_states.head.states import LookPerson
 from bender_ltm_demos.states import AskName
 
 
@@ -260,15 +257,7 @@ if __name__ == '__main__':
         from bender_skills import robot_factory
 
         rospy.init_node('ltm_demo__human_session')
-
-        robot = robot_factory.build([
-            # neck
-            "tts",
-            "display_interface",
-            "facial_features",
-            "emotion_recognition"
-        ], core=False)
-
+        robot = robot_factory.build(["tts", "display_interface", "facial_features", "emotion_recognition"], core=False)
         robot.check()
 
         # build machine

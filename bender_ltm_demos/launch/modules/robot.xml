@@ -25,7 +25,7 @@
     </include>
 
     <!-- robot -->
-    <include file="$(find bender_ltm_demos)/launch/robot_$(arg robot).xml"/>
+    <include file="$(find bender_ltm_demos)/launch/modules/robot_$(arg robot).xml"/>
 
 
     <!-- ================================= -->

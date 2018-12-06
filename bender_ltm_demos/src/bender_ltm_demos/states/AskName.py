@@ -7,7 +7,7 @@ from uchile_states.interaction.states import Speak, KeyboardInput
 
 class SaveNameAsInformation(smach.State):
 
-    def __init__(self, robot):
+    def __init__(self, robot, text=None):
         smach.State.__init__(
             self,
             outcomes=['succeeded', 'aborted', 'preempted'],
@@ -15,24 +15,27 @@ class SaveNameAsInformation(smach.State):
             output_keys=['operator_name'])
 
         self.robot = robot
+        self.text = text
 
     def execute(self, userdata):
         name = userdata.recognized_sentence
         userdata.operator_name = name
-        self.robot.say("nice to meet you " + name)
+        speak_text = self.text if self.text else "nice to meet you " + name
+        self.robot.say(speak_text)
         self.robot.tts.wait_until_done(timeout=4.0)
         return "succeeded"
 
 
-def getInstance(robot):
+def getInstance(robot, text=None, end_text=None):
     sm = smach.StateMachine(
         outcomes=['succeeded', 'aborted', 'preempted'],
         output_keys=['operator_name'])
 
+    speak_text = text if text else "Can you tell me your name?"
     with sm:
         smach.StateMachine.add(
             'INTRODUCE',
-            Speak(robot, text="Can you tell me your name?"),
+            Speak(robot, text=speak_text),
             transitions={'succeeded': 'KEYBOARD_INPUT'})
 
         smach.StateMachine.add(
@@ -42,7 +45,7 @@ def getInstance(robot):
 
         smach.StateMachine.add(
             'SAVE_NAME',
-            SaveNameAsInformation(robot))
+            SaveNameAsInformation(robot, end_text))
 
     return sm
 
