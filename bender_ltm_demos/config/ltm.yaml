@@ -44,8 +44,8 @@ plugins:
       class: "ltm_addons::ImageStreamPlugin"
       type: "images"
       collection: "images"
-      topic: "/robot/fake/sensors/camera/image_raw"
-      buffer_frequency: 3.0
+      topic: "/bender/sensors/rgbd_head/rgb/image_raw"
+      buffer_frequency: 1.0
       buffer_size: 100
 
   # Entity plugins
