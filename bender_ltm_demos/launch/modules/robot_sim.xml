@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="worldname" default="amtc"/>    
+    <arg name="worldname" default="lab"/>
 
     <!-- STAGE -->
     <include file="$(find bender_stage)/launch/bender.launch">
