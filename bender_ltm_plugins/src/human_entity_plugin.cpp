@@ -27,7 +27,7 @@ namespace bender_ltm_plugins
         _field_names.insert("age_top");
         _field_names.insert("age_avg");
         _field_names.insert("live_phase");
-        _field_names.insert("genre");
+        _field_names.insert("gender");
         // _field_names.insert("face");
         _field_names.insert("emotion");
         _field_names.insert("last_seen");
@@ -123,7 +123,7 @@ namespace bender_ltm_plugins
     MetadataPtr HumanEntityPlugin::make_metadata(const EntityMsg &entity) {
         MetadataPtr meta = this->ltm_create_metadata(entity);
         meta->append("name", entity.name);
-        meta->append("genre", entity.genre);
+        meta->append("gender", entity.gender);
         meta->append("age_bottom", entity.age_bottom);
         meta->append("age_top", entity.age_top);
         meta->append("age_avg", entity.age_avg);
@@ -194,7 +194,7 @@ namespace bender_ltm_plugins
             curr.age_top = curr_with_md->age_top;
             curr.age_avg = curr_with_md->age_avg;
             curr.live_phase = curr_with_md->live_phase;
-            curr.genre = curr_with_md->genre;
+            curr.gender = curr_with_md->gender;
             curr.face = curr_with_md->face;
             curr.emotion = curr_with_md->emotion;
             curr.last_seen = curr_with_md->last_seen;
@@ -219,7 +219,7 @@ namespace bender_ltm_plugins
         entity::update_field<uint8_t>(log, "age_top", curr.age_top, diff.age_top, msg.age_top, _null_e.age_top);
         entity::update_field<uint8_t>(log, "age_avg", curr.age_avg, diff.age_avg, msg.age_avg, _null_e.age_avg);
         entity::update_field<uint8_t>(log, "live_phase", curr.live_phase, diff.live_phase, msg.live_phase, _null_e.live_phase);
-        entity::update_field<uint8_t>(log, "genre", curr.genre, diff.genre, msg.genre, _null_e.genre);
+        entity::update_field<uint8_t>(log, "gender", curr.gender, diff.gender, msg.gender, _null_e.gender);
         entity::update_field<sensor_msgs::Image>(log, "face", curr.face, diff.face, msg.face, _null_e.face);
         entity::update_field<std::string>(log, "emotion", curr.emotion, diff.emotion, msg.emotion, _null_e.emotion);
         entity::update_field<ros::Time>(log, "last_seen", curr.last_seen, diff.last_seen, msg.last_seen, _null_e.last_seen);
@@ -344,7 +344,7 @@ namespace bender_ltm_plugins
         EntityMsg _in = *in;
 
         if (name == "name") { out.name = _in.name; } // STATIC FIELD
-        else if (name == "genre") { out.genre = _in.genre; }
+        else if (name == "gender") { out.gender = _in.gender; }
         else if (name == "age_bottom") { out.age_bottom = _in.age_bottom; }
         else if (name == "age_top") { out.age_top = _in.age_top; }
         else if (name == "age_avg") { out.age_avg = _in.age_avg; }
@@ -356,7 +356,7 @@ namespace bender_ltm_plugins
 
     void HumanEntityPlugin::build_null(EntityMsg &entity) {
         entity.name = ""; // STATIC FIELD
-        entity.genre = 0;
+        entity.gender = 0;
         entity.age_bottom = 0;
         entity.age_top = 0;
         entity.age_avg = 0;

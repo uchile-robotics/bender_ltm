@@ -54,8 +54,8 @@ class RecordHumanAgeAndGenre(smach.State):
             if 'gender' in ud.facial_features and len(ud.facial_features['gender']) > 0:
                 gender = ud.facial_features['gender'][0]
                 gender = gender.lower()
-                entity.genre = HumanEntity.MASCULINE if gender == "male" else HumanEntity.FEMININE
-                ud.human.genre = entity.genre
+                entity.gender = HumanEntity.MASCULINE if gender == "male" else HumanEntity.FEMININE
+                ud.human.gender = entity.gender
 
             if 'age' in ud.facial_features and len(ud.facial_features['age']) > 0:
                 age_range = ud.facial_features['age'][0]
@@ -112,12 +112,12 @@ class SayHumanResults(smach.State):
 
     def execute(self, ud):
         entity = ud.human
-        genre = "male" if entity.genre is HumanEntity.MASCULINE else "female"
+        gender = "male" if entity.gender is HumanEntity.MASCULINE else "female"
         phase = "an adult"
         if entity.live_phase is HumanEntity.CHILD:
-            phase = "a boy" if genre is "male" else "a girl"
+            phase = "a boy" if gender is "male" else "a girl"
 
-        goodbye = "It seems you are a " + genre + " human"
+        goodbye = "It seems you are a " + gender + " human"
         goodbye += " between " + str(entity.age_bottom) + " and " + str(entity.age_top) + " years"
         goodbye += ", so you are " + phase + " ."
         goodbye += " Thank you very much " + entity.name + ", see you later"
@@ -176,11 +176,11 @@ def build_facial_features_sm(robot):
             Speak(robot, text="Please, look me in the eyes ..."),
             transitions={'succeeded': 'GET_AGE_AND_GENRE'})
 
-        age_genre_sm = facial_features_recognition.getInstance(robot)
-        ltm.register_state(age_genre_sm, ["age_estimation", "genre_estimation"])
+        age_gender_sm = facial_features_recognition.getInstance(robot)
+        ltm.register_state(age_gender_sm, ["age_estimation", "gender_estimation"])
         smach.StateMachine.add(
             'GET_AGE_AND_GENRE',
-            age_genre_sm,
+            age_gender_sm,
             transitions={
                 'succeeded': 'RECORD_AGE_AND_GENRE',
                 'failed': 'RECORD_AGE_AND_GENRE'
@@ -257,7 +257,7 @@ if __name__ == '__main__':
         from bender_skills import robot_factory
 
         rospy.init_node('ltm_demo__human_session')
-        robot = robot_factory.build(["tts", "display_interface", "facial_features", "emotion_recognition"], core=False)
+        robot = robot_factory.build(["joy", "tts", "display_interface", "facial_features", "emotion_recognition"], core=False)
         robot.check()
 
         # build machine

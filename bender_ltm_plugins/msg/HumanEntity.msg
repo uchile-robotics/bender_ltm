@@ -6,7 +6,7 @@ uint8 age_bottom
 uint8 age_top
 uint8 age_avg
 uint8 live_phase
-uint8 genre
+uint8 gender
 sensor_msgs/Image face
 
 # dynamic fields

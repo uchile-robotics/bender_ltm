@@ -42,7 +42,7 @@ def episode_review(robot):
     print " == tag: " + tag + " ==="
     print_episodes(episodes)
 
-    tag = "genre_estimation"
+    tag = "gender_estimation"
     episodes = robot.ltm.get_episodes_by_tag(tag=tag)
     print " == tag: " + tag + " ==="
     print_episodes(episodes)
@@ -103,7 +103,7 @@ def where_review(robot):
 
 def entity_review(robot):
     """
-    - A: Overview of known humans: name, age, genre, phase.
+    - A: Overview of known humans: name, age, gender, phase.
     - B: About H1 - First record: What, When, Where.
     - C: About H1 - Last record: What, When, Where.
     - D: About H1 - Knowledge at middle time: What, When, Where.

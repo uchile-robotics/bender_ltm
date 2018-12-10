@@ -24,11 +24,11 @@ def print_episodes(episodes):
 
 
 def print_human(human):
-    genre = "unkown genre"
-    if human.genre is human.MASCULINE:
-        genre = "male"
-    elif human.genre is human.FEMININE:
-        genre = "female"
+    gender = "unkown gender"
+    if human.gender is human.MASCULINE:
+        gender = "male"
+    elif human.gender is human.FEMININE:
+        gender = "female"
 
     phase = "unkown phase"
     if human.live_phase is human.CHILD:
@@ -37,7 +37,7 @@ def print_human(human):
         phase = "adult"
 
     age = str(human.age_avg) if human.age_avg is not 0 else "unknown age"
-    print human.name + " (" + age + ") " + genre + ", " + phase
+    print human.name + " (" + age + ") " + gender + ", " + phase
 
 
 def print_humans(humans):

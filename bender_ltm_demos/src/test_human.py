@@ -85,7 +85,7 @@ if __name__ == '__main__':
     # ALL PEOPLE
     it.query('{}')
 
-    static_f = ['name', 'age_bottom', 'age_top', 'age_avg', 'live_phase', 'genre', 'emotion', 'last_seen']
+    static_f = ['name', 'age_bottom', 'age_top', 'age_avg', 'live_phase', 'gender', 'emotion', 'last_seen']
 
     uid = 1312696024
     show("COMPLETE", uid, 0, 0)
