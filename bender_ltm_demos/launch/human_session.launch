@@ -1,7 +1,7 @@
 <launch>
     
     <!-- Robot -->
-    <include file="$(find bender_ltm_demos)/launch/modules/robot.xml"/>
+    <!-- <include file="$(find bender_ltm_demos)/launch/modules/robot.xml"/> -->
 
     <!-- localization -->
     <include file="$(find bender_ltm_demos)/launch/modules/localization.xml"/>
@@ -13,7 +13,7 @@
     <include file="$(find bender_ltm_demos)/launch/modules/hri.xml"/>
         
     <!-- Perception -->
-    <include file="$(find bender_ltm_demos)/launch/modules/perception.xml"/>
+    <!-- <include file="$(find bender_ltm_demos)/launch/modules/perception.xml"/> -->
 
     <!-- visualization -->
     <!-- <include file="$(find bender_ltm_demos)/launch/visualization.xml"/> -->
