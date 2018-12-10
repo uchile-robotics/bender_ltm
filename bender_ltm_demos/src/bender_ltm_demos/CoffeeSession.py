@@ -8,7 +8,7 @@ from bender_ltm_plugins.msg import HumanEntity
 
 # State Machines
 from uchile_states.interaction.states import Speak
-from uchile_states.perception import wait_face_detection
+from uchile_states.joy.states import WaitForButtonA as WaitForButton
 from bender_ltm_demos.states import AskName
 
 
@@ -52,17 +52,6 @@ class RecordHappyHuman(smach.State):
         return 'succeeded'
 
 
-class SleepState(smach.State):
-
-    def __init__(self, sleep_time):
-        smach.State.__init__(self, outcomes=['succeeded', 'aborted', 'preempted'])
-        self.sleep_time = sleep_time
-
-    def execute(self, ud):
-        rospy.sleep(self.sleep_time)
-        return 'succeeded'
-
-
 class DeliverCoffee(smach.State):
 
     def __init__(self, robot):
@@ -75,7 +64,7 @@ class DeliverCoffee(smach.State):
 
     def execute(self, ud):
         entity = ud.human
-        rospy.sleep(5.0)
+        self.robot.joy.wait_for_button('A', 5.0)
         self.robot.tts.say("Hei " + entity.name + ", enjoy this coffee.")
         self.robot.tts.wait_until_done(timeout=10.0)
         return 'succeeded'
@@ -87,7 +76,9 @@ def build_get_order_sm(robot):
         output_keys=['human'])
     ltm.register_state(sm, ["get_order"])
 
-    approach_sm = SleepState(5.0)
+    wait_face_sm = WaitForButton(robot, 15.0)
+    approach_sm = WaitForButton(robot, 15.0)
+    ltm.register_state(approach_sm, ["wait_face"])
     ltm.register_state(approach_sm, ["approach_human"])
 
     with sm:
@@ -98,7 +89,7 @@ def build_get_order_sm(robot):
         # )
         smach.StateMachine.add(
             'WAIT_FACE',
-            wait_face_detection.getInstance(robot, time_out=10),
+            wait_face_sm,
             transitions={'succeeded': 'APPROACH_TO_HUMAN'}
         )
         smach.StateMachine.add(
@@ -127,8 +118,8 @@ def build_prepare_coffee_sm(robot):
     sm = smach.StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
     ltm.register_state(sm, ["deliver_order"])
 
-    go_sm = SleepState(5.0)
-    prepare_sm = SleepState(5.0)
+    go_sm = WaitForButton(robot, 15.0)
+    prepare_sm = WaitForButton(robot, 15.0)
     ltm.register_state(go_sm, ["go_to_kitchen"])
     ltm.register_state(prepare_sm, ["prepare_coffee"])
 
@@ -150,7 +141,7 @@ def build_give_order_sm(robot):
         input_keys=['human'])
     ltm.register_state(sm, ["deliver_order"])
 
-    approach_sm = SleepState(5.0)
+    approach_sm = WaitForButton(robot, 15.0)
     give_sm = DeliverCoffee(robot)
     ltm.register_state(approach_sm, ["approach_human"])
     ltm.register_state(give_sm, ["deliver_coffee"])
@@ -201,7 +192,7 @@ if __name__ == '__main__':
 
         rospy.init_node('ltm_demo__coffee_session')
 
-        robot = robot_factory.build(["tts", "facial_features", "display_interface"], core=False)
+        robot = robot_factory.build(["joy", "tts", "display_interface"], core=False)
         robot.check()
 
         # build machine
