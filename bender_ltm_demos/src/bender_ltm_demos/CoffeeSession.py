@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+__author__ = 'Matías Pavez'
+__email__ = 'matias.pavez@ing.uchile.cl'
+
 import rospy
 import smach
 
@@ -9,7 +13,9 @@ from bender_ltm_plugins.msg import HumanEntity
 # State Machines
 from uchile_states.interaction.states import Speak
 from uchile_states.joy.states import WaitForButtonA as WaitForButton
-from bender_ltm_demos.states import AskName
+
+HUMAN_NAME = "luz"
+HUMAN_NAME = "matías"
 
 
 class RecordHuman(smach.State):
@@ -18,7 +24,6 @@ class RecordHuman(smach.State):
         smach.State.__init__(
             self,
             outcomes=['succeeded', 'aborted', 'preempted'],
-            input_keys=['operator_name'],
             output_keys=['human'])
 
         self._ltm_topic = "/bender/ltm/entity/human/update"
@@ -26,7 +31,7 @@ class RecordHuman(smach.State):
 
     def execute(self, ud):
         entity = HumanEntity()
-        entity.name = ud.operator_name
+        entity.name = HUMAN_NAME
         self.ltm_pub.publish(entity)
         ud.human = entity
         return 'succeeded'
@@ -82,11 +87,6 @@ def build_get_order_sm(robot):
     ltm.register_state(approach_sm, ["approach_human"])
 
     with sm:
-        # smach.StateMachine.add(
-        #     'POSITION_HEAD',
-        #     LookPerson(robot),
-        #     transitions={'succeeded': 'WAIT_OPERATOR'}
-        # )
         smach.StateMachine.add(
             'WAIT_FACE',
             wait_face_sm,
@@ -99,14 +99,9 @@ def build_get_order_sm(robot):
         )
         smach.StateMachine.add(
             'SAY_HELLO',
-            Speak(robot, text="Hello, i will prepare a coffee for you."),
-            transitions={'succeeded': 'ASK_NAME'}
+            Speak(robot, text="Hello, " + HUMAN_NAME + " i will prepare a coffee for you."),
+            transitions={'succeeded': 'RECORD_HUMAN'}
         )
-        smach.StateMachine.add(
-            'ASK_NAME',
-            AskName.getInstance(robot, "i need you to write your name please.", "thank you"),
-            transitions={'succeeded': 'RECORD_HUMAN'})
-
         smach.StateMachine.add(
             'RECORD_HUMAN',
             RecordHuman(),

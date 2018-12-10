@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+__author__ = 'Matías Pavez'
+__email__ = 'matias.pavez@ing.uchile.cl'
+
 import rospy
 import smach
 
@@ -8,10 +12,13 @@ from bender_ltm_plugins.msg import HumanEntity
 
 # State Machines
 from uchile_states.interaction.states import Speak
+from uchile_states.joy.states import WaitForButtonA as WaitForButton
 from uchile_states.perception import facial_features_recognition
 from uchile_states.perception import emotion_recognition
-from uchile_states.perception import wait_face_detection
-from bender_ltm_demos.states import AskName
+
+
+HUMAN_NAME = "luz"
+HUMAN_NAME = "matías"
 
 
 class RecordHuman(smach.State):
@@ -20,7 +27,6 @@ class RecordHuman(smach.State):
         smach.State.__init__(
             self,
             outcomes=['succeeded', 'aborted', 'preempted'],
-            input_keys=['operator_name'],
             output_keys=['human'])
 
         self._ltm_topic = "/bender/ltm/entity/human/update"
@@ -28,7 +34,7 @@ class RecordHuman(smach.State):
 
     def execute(self, ud):
         entity = HumanEntity()
-        entity.name = ud.operator_name
+        entity.name = HUMAN_NAME
         self.ltm_pub.publish(entity)
         ud.human = entity
         return 'succeeded'
@@ -128,14 +134,23 @@ class SayHumanResults(smach.State):
 
 def build_wait_human_sm(robot):
     sm = smach.StateMachine(outcomes=['succeeded', 'aborted', 'preempted'])
-    ltm.register_state(sm, ["wait_for_human"])
+    ltm.register_state(sm, ["approach_human"])
+
+    wait_face_sm = WaitForButton(robot, 15.0)
+    approach_sm = WaitForButton(robot, 15.0)
+    ltm.register_state(approach_sm, ["look_for_human"])
+    ltm.register_state(approach_sm, ["approach_human"])
     with sm:
-        # smach.StateMachine.add(
-        #     'POSITION_HEAD',
-        #     LookPerson(robot),
-        #     transitions={'succeeded': 'WAIT_OPERATOR'}
-        # )
-        smach.StateMachine.add('WAIT_FACE', wait_face_detection.getInstance(robot, time_out=10))
+        smach.StateMachine.add(
+            'LOOK_FOR_HUMAN',
+            wait_face_sm,
+            transitions={'succeeded': 'APPROACH_TO_HUMAN'}
+        )
+        smach.StateMachine.add(
+            'APPROACH_TO_HUMAN',
+            approach_sm,
+            transitions={'succeeded': 'succeeded'}
+        )
     return sm
 
 
@@ -148,11 +163,11 @@ def build_introduction_sm(robot):
         smach.StateMachine.add(
             'SAY_HELLO',
             Speak(robot, text="Hello, i am bender ..."),
-            transitions={'succeeded': 'ASK_NAME'}
-        )
+            transitions={'succeeded': 'ASK_NAME'})
+
         smach.StateMachine.add(
             'ASK_NAME',
-            AskName.getInstance(robot),
+            Speak(robot, text="Nice to meet you " + HUMAN_NAME),
             transitions={'succeeded': 'RECORD_HUMAN'})
 
         smach.StateMachine.add(
@@ -257,7 +272,7 @@ if __name__ == '__main__':
         from bender_skills import robot_factory
 
         rospy.init_node('ltm_demo__human_session')
-        robot = robot_factory.build(["joy", "tts", "display_interface", "facial_features", "emotion_recognition"], core=False)
+        robot = robot_factory.build(["joy", "tts", "facial_features", "emotion_recognition"], core=False)
         robot.check()
 
         # build machine
