@@ -14,8 +14,5 @@
     <class type="bender_ltm_plugins::HumanEntityPlugin" base_class_type="ltm::plugin::EntityBase">
         <description>This is an LTM plugin. It provides up to date information about people.</description>
     </class>
-    <class type="bender_ltm_plugins::CrowdEntityPlugin" base_class_type="ltm::plugin::EntityBase">
-        <description>This is an LTM plugin. It provides up to date information about a crowd.</description>
-    </class>
 
 </library>
