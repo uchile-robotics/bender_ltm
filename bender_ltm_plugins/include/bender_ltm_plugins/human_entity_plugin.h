@@ -45,10 +45,6 @@ namespace bender_ltm_plugins
         typedef ltm_db::MessageWithMetadata<LogType> LogWithMetadata;
         typedef boost::shared_ptr<const LogWithMetadata> LogWithMetadataPtr;
 
-        // plugin specific variables
-        EntityMsg _null_e;
-        std::set<std::string> _field_names;
-
         // ROS API
         std::string _log_prefix;
         std::string _stm_topic;
@@ -64,23 +60,27 @@ namespace bender_ltm_plugins
 
     private:
         void callback(const EntityMsg &msg);
-        void build_null(EntityMsg &entity);
         uint32_t lookup_uid(std::string name);
+        void build_null(EntityMsg &entity);
+        void fill_field_names(std::set<std::string> &names);
 
     public:
+        // EntityBase Methods
         std::string get_type();
         void initialize(const std::string &param_ns, DBConnectionPtr db_ptr, std::string db_name);
         void register_episode(uint32_t uid);
         void unregister_episode(uint32_t uid);
         void collect(uint32_t uid, ltm::What &msg, ros::Time _start, ros::Time _end);
         void query(const std::string &json, ltm::QueryServer::Response &res, bool trail);
-        void update(const EntityMsg &msg);
         void drop_db();
         void reset(const std::string &db_name);
         void append_status(std::stringstream &status);
+
+        // EntityCollection Methods
         MetadataPtr make_metadata(const EntityMsg &entity);
         void retrace(EntityMsg &entity, const std::vector<uint32_t> &logs);
-        void retrace_retrieve_field(const std::string& name, EntityWithMetadataPtr &in, EntityMsg &out);
+        void update(const EntityMsg &msg);
+        void copy_field(const std::string& name, EntityWithMetadataPtr &in, EntityMsg &out);
     };
 
 

@@ -19,18 +19,9 @@ namespace bender_ltm_plugins
         _log_prefix = "[LTM][Human Entity]: ";
         ROS_DEBUG_STREAM(_log_prefix << "plugin initialized with ns: " << param_ns);
 
-        build_null(_null_e);
-
-        // all fields
-        _field_names.insert("name"); // STATIC FIELD
-        _field_names.insert("age_bottom");
-        _field_names.insert("age_top");
-        _field_names.insert("age_avg");
-        _field_names.insert("live_phase");
-        _field_names.insert("gender");
-        // _field_names.insert("face");
-        _field_names.insert("emotion");
-        _field_names.insert("last_seen");
+        // init fields
+        build_null(this->_null_e);
+        fill_field_names(this->_field_names);
 
         // parameters
         ltm::util::ParameterServerWrapper psw("~");
@@ -183,7 +174,7 @@ namespace bender_ltm_plugins
         this->ltm_get_registry(log.episode_uids);
 
         // TODO: WE CAN USE A CACHE FOR RECENT ENTITIES
-        EntityMsg curr = _null_e;
+        EntityMsg curr = this->_null_e;
         EntityWithMetadataPtr curr_with_md;
         curr.meta.uid = uid;
         curr.meta.log_uid = log.log_uid;
@@ -214,15 +205,15 @@ namespace bender_ltm_plugins
 
         EntityMsg diff;
         diff.meta = curr.meta;
-        entity::update_field<std::string>(log, "name", curr.name, diff.name, msg.name, _null_e.name);
-        entity::update_field<uint8_t>(log, "age_bottom", curr.age_bottom, diff.age_bottom, msg.age_bottom, _null_e.age_bottom);
-        entity::update_field<uint8_t>(log, "age_top", curr.age_top, diff.age_top, msg.age_top, _null_e.age_top);
-        entity::update_field<uint8_t>(log, "age_avg", curr.age_avg, diff.age_avg, msg.age_avg, _null_e.age_avg);
-        entity::update_field<uint8_t>(log, "live_phase", curr.live_phase, diff.live_phase, msg.live_phase, _null_e.live_phase);
-        entity::update_field<uint8_t>(log, "gender", curr.gender, diff.gender, msg.gender, _null_e.gender);
-        entity::update_field<sensor_msgs::Image>(log, "face", curr.face, diff.face, msg.face, _null_e.face);
-        entity::update_field<std::string>(log, "emotion", curr.emotion, diff.emotion, msg.emotion, _null_e.emotion);
-        entity::update_field<ros::Time>(log, "last_seen", curr.last_seen, diff.last_seen, msg.last_seen, _null_e.last_seen);
+        entity::update_field<std::string>(log, "name", curr.name, diff.name, msg.name, this->_null_e.name);
+        entity::update_field<uint8_t>(log, "age_bottom", curr.age_bottom, diff.age_bottom, msg.age_bottom, this->_null_e.age_bottom);
+        entity::update_field<uint8_t>(log, "age_top", curr.age_top, diff.age_top, msg.age_top, this->_null_e.age_top);
+        entity::update_field<uint8_t>(log, "age_avg", curr.age_avg, diff.age_avg, msg.age_avg, this->_null_e.age_avg);
+        entity::update_field<uint8_t>(log, "live_phase", curr.live_phase, diff.live_phase, msg.live_phase, this->_null_e.live_phase);
+        entity::update_field<uint8_t>(log, "gender", curr.gender, diff.gender, msg.gender, this->_null_e.gender);
+        entity::update_field<sensor_msgs::Image>(log, "face", curr.face, diff.face, msg.face, this->_null_e.face);
+        entity::update_field<std::string>(log, "emotion", curr.emotion, diff.emotion, msg.emotion, this->_null_e.emotion);
+        entity::update_field<ros::Time>(log, "last_seen", curr.last_seen, diff.last_seen, msg.last_seen, this->_null_e.last_seen);
 
         size_t n_added = log.new_f.size();
         size_t n_updated = log.updated_f.size();
@@ -250,108 +241,30 @@ namespace bender_ltm_plugins
         this->_registry.insert(reg);
     }
 
-    void HumanEntityPlugin::retrace(EntityMsg &entity, const std::vector<uint32_t> &logs) {
-        // ROS_WARN_STREAM("...RETRACING FROM PLUGIN...");
-        entity = this->_null_e;
-
-        std::set<std::string> acquired_fields;
-        std::set<std::string> remaining_fields = _field_names;
-        uint32_t entity_uid = 0;
-
-        std::vector<std::string> all_fields(remaining_fields.begin(), remaining_fields.end());
-        // ROS_INFO_STREAM("ALL FIELDS (total=" << all_fields.size() << "): " << ltm::util::vector_to_str(all_fields));
-
-        std::vector<uint32_t>::const_iterator it;
-        for (it = logs.begin(); it != logs.end(); ++it) {
-            LogType log;
-            this->ltm_get_log(*it, log);
-            entity_uid = log.entity_uid;
-            // ROS_WARN_STREAM("Got log: " << log.log_uid << " for entity " << log.entity_uid);
-
-            EntityWithMetadataPtr diff;
-            bool loaded = false;
-
-            std::set<std::string>::iterator f_it;
-            for (f_it = remaining_fields.begin(); f_it != remaining_fields.end(); ++f_it) {
-                std::string field = *f_it;
-                // look for in new, updated and deleted
-                bool found = false;
-
-                std::vector<std::string>::iterator s_it;
-                s_it = std::find(log.new_f.begin(), log.new_f.end(), field);
-                if (s_it != log.new_f.end()) {
-                    found = true;
-                    // ROS_INFO_STREAM(" - f: " << field << " NEW");
-                    // RETRIEVE
-                    if (!loaded) {
-                        if (!this->ltm_get_diff(log.log_uid, diff)) {
-                            ROS_ERROR_STREAM(" - could not load trail entity register #: " << log.log_uid);
-                            break;
-                        }
-                        loaded = true;
-                    }
-                    this->retrace_retrieve_field(field, diff, entity);
-                }
-                if (!found) {
-                    s_it = std::find(log.updated_f.begin(), log.updated_f.end(), field);
-                    if (s_it != log.updated_f.end()) {
-                        found = true;
-                        // RETRIEVE
-                        // ROS_INFO_STREAM(" - f: " << field << " UPDATED");
-                        if (!loaded) {
-                            if (!this->ltm_get_diff(log.log_uid, diff)) {
-                                ROS_ERROR_STREAM(" - could not load trail entity register #: " << log.log_uid);
-                                break;
-                            }
-                            loaded = true;
-                        }
-                        this->retrace_retrieve_field(field, diff, entity);
-                    }
-                }
-                if (!found) {
-                    s_it = std::find(log.removed_f.begin(), log.removed_f.end(), field);
-                    if (s_it != log.removed_f.end()) {
-                        found = true;
-                        // OK (field is already null)
-                        // ROS_INFO_STREAM(" - f: " << field << " REMOVED");
-                    }
-                }
-                
-                if (found) {
-                    acquired_fields.insert(field);
-                    remaining_fields.erase(field);
-
-                    if (remaining_fields.empty()) {
-                        ROS_INFO_STREAM("Entity (" << entity_uid << ") retrace. Found all fields ("
-                                        << acquired_fields.size() << ").");
-                        return;
-                    }
-                } else {
-                    // ROS_INFO_STREAM(" - f: " << field << " - not found");
-                }
-            }    
-        }
-        // size_t n_acquired = acquired_fields.size();
-        // size_t n_missing = remaining_fields.size();
-        // std::vector<std::string> acquired(acquired_fields.begin(), acquired_fields.end());
-        // std::vector<std::string> missing(remaining_fields.begin(), remaining_fields.end());
-        // ROS_INFO_STREAM("Entity (" << entity_uid << ") retrace."
-        //                 << "\n - " << n_acquired << " fields were remembered: " << ltm::util::vector_to_str(acquired) 
-        //                 << ".\n - " << n_missing << " fields are unknown: " << ltm::util::vector_to_str(missing));
-    }
-
-    void HumanEntityPlugin::retrace_retrieve_field(const std::string& name, EntityWithMetadataPtr &in, EntityMsg &out) {
+    void HumanEntityPlugin::copy_field(const std::string& field, EntityWithMetadataPtr &in, EntityMsg &out) {
         EntityMsg _in = *in;
 
-        if (name == "name") { out.name = _in.name; } // STATIC FIELD
-        else if (name == "gender") { out.gender = _in.gender; }
-        else if (name == "age_bottom") { out.age_bottom = _in.age_bottom; }
-        else if (name == "age_top") { out.age_top = _in.age_top; }
-        else if (name == "age_avg") { out.age_avg = _in.age_avg; }
-        else if (name == "live_phase") { out.live_phase = _in.live_phase; }
-        else if (name == "emotion") { out.emotion = _in.emotion; }
-        else if (name == "face") { out.face = _in.face; }
-        else if (name == "last_seen") { out.last_seen = _in.last_seen; }
+        if (field == "name")            out.name       = _in.name; // STATIC FIELD
+        else if (field == "gender")     out.gender     = _in.gender;
+        else if (field == "age_bottom") out.age_bottom = _in.age_bottom;
+        else if (field == "age_top")    out.age_top    = _in.age_top;
+        else if (field == "age_avg")    out.age_avg    = _in.age_avg;
+        else if (field == "live_phase") out.live_phase = _in.live_phase;
+        else if (field == "emotion")    out.emotion    = _in.emotion;
+        else if (field == "face")       out.face       = _in.face;
+        else if (field == "last_seen")  out.last_seen  = _in.last_seen;
+    }
+
+    void HumanEntityPlugin::fill_field_names(std::set<std::string> &names) {
+        names.insert("name"); // STATIC FIELD
+        names.insert("age_bottom");
+        names.insert("age_top");
+        names.insert("age_avg");
+        names.insert("live_phase");
+        names.insert("gender");
+        // names.insert("face");
+        names.insert("emotion");
+        names.insert("last_seen");
     }
 
     void HumanEntityPlugin::build_null(EntityMsg &entity) {
