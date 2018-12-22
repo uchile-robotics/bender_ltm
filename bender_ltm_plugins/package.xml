@@ -4,18 +4,22 @@
     <!-- PACKAGE INFORMATION -->
     <!-- - - - - - - - - - - -->
     <name>bender_ltm_plugins</name>
-    <version>0.0.0</version>
-    <description>
-        (Sample code and scripts) Long Term Memory for robots using ROS. Thesis project. 
-    </description>
-    <author email="matias.pavez@ing.uchile.cl">Matías Pavez</author>
-    <maintainer email="matias.pavez@ing.uchile.cl">Matías Pavez</maintainer>
+    <version>1.0.0</version>
+    
+    <description>LTM plugins for the Bender robot.</description>
 
-    <license>GPL-3.0</license>
-    <!-- <url type="repository">https://github.com/mpavezb/bender_ltm_plugins</url> -->
+    <maintainer email="bender.devel@gmail.com">UChile Homebreakers</maintainer>
+    <author email="matias.pavez.b@gmail.com">Matías Pavez - UChile Homebreakers</author>
+
+    <!-- about bender and related repository -->
+    <url type="website">http://robotica-uchile.amtc.cl/</url>
+    <url type="bugtracker">https://github.com/uchile-robotics/bender_ltm/issues</url>
+    <url type="repository">https://github.com/uchile-robotics/bender_ltm</url>
+
+    <license>GPLv3</license>
 
 
-    <!-- SYSTEM DEPENDENCIES -->
+    <!-- DEPENDENCIES -->
     <!-- - - - - - - - - - - -->
 
     <!--  build system tool to build this package -->

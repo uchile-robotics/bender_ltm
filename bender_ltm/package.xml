@@ -1,18 +1,13 @@
 <?xml version="1.0"?>
 <package format="2">
   
-    <!-- PACKAGE INFORMATION -->
-    <!-- - - - - - - - - - - -->
-
     <name>bender_ltm</name>
-    <version>2.0.0</version>
+    <version>1.0.0</version>
 
-    <description>LTM packages for bender demonstration</description>
-    <maintainer email="bender.devel@gmail.com">
-      Bender Team - UChile Homebreakers</maintainer>
-    <author     email="bender.devel@gmail.com">
-      Bender Team - UChile Homebreakers</author>
-    <license>TODO</license>
+    <description>LTM packages for the Bender robot.</description>
+    <maintainer email="bender.devel@gmail.com">UChile Homebreakers</maintainer>
+    <author email="matias.pavez.b@gmail.com">Matías Pavez - UChile Homebreakers</author>
+    <license>GPLv3</license>
 
     <buildtool_depend>catkin</buildtool_depend>
     

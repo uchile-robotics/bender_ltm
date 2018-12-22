@@ -1,6 +1,6 @@
-# bender_ltm ROS package
+# bender_ltm ROS metapackage
 
-This package contains Bender specific plugins and demonstration code for the LTM (long-term-memory) project. It is developed as part of Matías Pavez's thesis project. Plugins for location retrieval and human entities are implemented. This work is better explained in the [thesis document (in spanish)](https://github.com/mpavezb/memoria).
+This (meta)package contains Bender specific plugins and demonstration code for the LTM (long-term-memory) project. Plugins for location retrieval and human entities are implemented. It is developed as part of Matías Pavez's thesis project. This work is better explained in the [thesis document (in spanish)](https://github.com/mpavezb/memoria).
 
 
 The LTM documentation can be located in the [repository of the ltm ROS package](https://github.com/mpavezb/ltm).
